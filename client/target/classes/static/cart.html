@@ -1,0 +1,472 @@
+<!DOCTYPE html >
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>购物车页面</title>
+    <link href="/AmazeUI/assets/css/amazeui.css" rel="stylesheet" type="text/css"/>
+    <link type="text/css" href="/css/optstyle.css" rel="stylesheet"/>
+    <link href="/basic/css/demo.css" rel="stylesheet" type="text/css"/>
+    <link type="text/css" href="/css/cartstyle.css" rel="stylesheet"/>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script language="JavaScript" src="/basic/js/jquery-1.7.min.js"></script>
+
+    <script language="JavaScript">
+        function search() {
+            var index=document.getElementById("searchInput").value;
+            if (index.length == 0){
+                alert("关键字不能为空！");
+                return;
+            }else {
+                window.location.href="/product/findByIndex/"+index+"/1";
+            }
+        }
+        function priceSum() {
+            var params=$("#price_sum_form").serializeArray();
+            var list={};
+            var items=[];
+            for (var item in params) {
+                list[params[item].name] = params[item].value;
+                if (params[item].name == "check-sum") {
+                    items.push(params[item].value);
+                }
+            }
+            var sum_price=0;
+            for (var i = 0;i<items.length;i++){
+                sum_price=parseFloat(sum_price)+parseFloat(items[i]);
+
+            }
+            $("#items_count").text(items.length);
+            $("#totalprice").text(getPrice(sum_price));
+
+        }
+        function getPrice(num) {
+            num += '';
+            num = num.replace(/[^0-9|\.]/g, '');
+
+            if (/^0+/)
+                num = num.replace(/^0+/, '');
+            if (!/\./.test(num))
+                num += '.00';
+            if (/^\./.test(num))
+                num = '0' + num;
+            num += '00';
+            num = num.match(/\d+\.\d{2}/)[0];
+            return num;
+        }
+
+        $(function () {
+            $(".increment").click(function () {
+                //获取数量文本框
+                var qinput = $(this).siblings(":text");
+                qinput.val(eval(qinput.val()) + 1);//数量加1
+                var cart = {};
+                var product = {};
+                product["product_id"] = qinput.attr("product_id");
+                cart["cart_count"] = qinput.val();
+                cart["cart_id"] = qinput.attr("id");
+                cart["product"] = product;
+                var id = qinput.attr("id");
+                //获取productid
+                $.ajax({
+                    url: "/cart/update",
+                    type: "put",
+                    data: JSON.stringify(cart),
+                    dataType: "json",
+                    contentType: "application/json",
+                    processData: false,
+                    success: function (data) {
+                        var price = getPrice(data.total_price);
+                        $("#total" + id).text(price);
+                        $("#price"+id).attr("value",price);
+                        priceSum();
+                    },
+                    error: function (data) {
+                        qinput.val(eval(qinput.val()) - 1);
+                        alert("修改失败");
+                    }
+                });
+            });
+
+            $(".reduce").click(function () {
+                //获取数量文本框
+                var qinput = $(this).siblings(":text");
+                if (eval(qinput.val()) >= 2) {
+                    qinput.val(eval(qinput.val()) - 1);//数量加1
+                    var cart = {};
+                    var product = {};
+                    product["product_id"] = qinput.attr("product_id");
+                    cart["cart_count"] = qinput.val();
+                    cart["cart_id"] = qinput.attr("id");
+                    cart["product"] = product;
+                    var id = qinput.attr("id");
+                    //获取productid
+                    $.ajax({
+                        url: "/cart/update",
+                        type: "put",
+                        data: JSON.stringify(cart),
+                        dataType: "json",
+                        contentType: "application/json",
+                        processData: false,
+                        success: function (data) {
+                            var price = getPrice(data.total_price);
+                            $("#total" + id).text(price);
+                            $("#price"+id).attr("value",price);
+                            priceSum();
+                        },
+                        error: function (data) {
+                            qinput.val(eval(qinput.val()) + 1);
+                            alert("修改失败");
+                        }
+                    });
+                } else {
+                    window.alert('该宝贝不能减少了呦！')
+                    qinput.val(1);
+                }
+            });
+
+            $("#all").click(function () {
+                if (this.checked)
+                    $(":checkbox").attr("checked", true);
+                else
+                    $(":checkbox").attr("checked", false);
+                priceSum();
+            });
+        });
+    </script>
+</head>
+<body>
+
+<!--顶部导航条 -->
+<div class="am-container header">
+    <ul class="message-l">
+        <div class="topMessage">
+            <div class="menu-hd" th:if="${session.viper.vip_id == 0}">
+                <a href="/login.html" target="_top" class="h">亲，请登录</a>
+                <a href="/register.html" target="_top">免费注册</a>
+            </div>
+            <div class="menu-hd" th:if="${session.viper.vip_id != 0}">
+                <input id="vip_id" th:value="${session.viper.vip_id}" type="hidden"/>
+                <b th:if="${session.viper.name != null}"
+                   th:text="${session.viper.name}+'('+${session.viper.username}+')'"></b>
+                <b th:if="${session.viper.name == null}" th:text="'null('+${session.viper.username}+')'"></b>
+                <a href="/account/logout" th:text="退出登录"></a>
+            </div>
+        </div>
+    </ul>
+    <ul class="message-r">
+        <div class="topMessage home">
+            <div class="menu-hd"><a href="/index.html" target="_top" class="h">商城首页</a></div>
+        </div>
+        <div class="topMessage my-shangcheng">
+            <div class="menu-hd MyShangcheng"><a href="#" target="_top"><i class="am-icon-user am-icon-fw"></i>个人中心</a>
+            </div>
+        </div>
+        <div class="topMessage mini-cart">
+            <div class="menu-hd"><a id="mc-menu-hd" th:href="'/cart/findByVipId/'+${session.viper.vip_id}" target="_top"><i
+                    class="am-icon-shopping-cart  am-icon-fw"></i><span>购物车</span><strong id="J_MiniCartNum"
+                                                                                          class="h">0</strong></a></div>
+        </div>
+        <div class="topMessage favorite">
+            <div class="menu-hd"><a href="#" target="_top"><i class="am-icon-heart am-icon-fw"></i><span>收藏夹</span></a>
+            </div>
+    </ul>
+</div>
+
+<!--悬浮搜索框-->
+
+<div class="nav white">
+    <div class="logo"><img src="/images/logo.png"/></div>
+    <div class="logoBig">
+        <li>
+            <img src="/images/logobig.png"/>
+        </li>
+    </div>
+
+    <div class="search-bar pr">
+        <a name="index_none_header_sysc" href="#"></a>
+        <form>
+            <input id="searchInput" name="index_none_header_sysc" type="text" placeholder="搜索" autocomplete="off">
+            <input id="ai-topsearch" class="submit am-btn" value="搜索" index="1" onclick="search();" type="button">
+        </form>
+    </div>
+</div>
+
+<div class="clear"></div>
+
+<!--购物车 -->
+<div class="concent">
+    <div id="cartTable">
+        <div class="cart-table-th">
+            <div class="wp">
+                <div class="th th-chk">
+                    <div id="J_SelectAll1" class="select-all J_SelectAll">
+
+                    </div>
+                </div>
+                <div class="th th-item">
+                    <div class="td-inner">商品信息</div>
+                </div>
+                <div class="th th-price">
+                    <div class="td-inner">单价</div>
+                </div>
+                <div class="th th-amount">
+                    <div class="td-inner">数量</div>
+                </div>
+                <div class="th th-sum">
+                    <div class="td-inner">金额</div>
+                </div>
+                <div class="th th-op">
+                    <div class="td-inner">操作</div>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <form id="price_sum_form">
+        <tr class="item-list" th:each="list:${cartList}">
+            <div class="bundle  bundle-last ">
+
+                <div class="bundle-main">
+                    <ul class="item-content clearfix">
+                        <li class="td td-chk">
+
+                            <div class="cart-checkbox ">
+                                <input class="check" th:cart_id="${list.cart_id}" th:id="'price'+${list.cart_id}" name="check-sum" th:value="${list.total_price}"
+                                       type="checkbox" onclick="priceSum() ">
+                                <label th:for="${list.cart_id}"></label>
+                            </div>
+
+                        </li>
+                        <li class="td td-item">
+                            <div class="item-pic">
+                                <a th:href="'/product/findById/'+${list.product.product_id}" target="_blank"
+                                   data-title="美康粉黛醉美东方唇膏口红正品 持久保湿滋润防水不掉色护唇彩妆"
+                                   class="J_MakePoint" data-point="tbcart.8.12">
+                                    <img th:src="'/product/'+${list.product.product_id}+'.jpg'"
+                                         class="itempic J_ItemImg" style="width: 80px;height: 80px; "></a>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-basic-info">
+                                    <a th:href="'/product/findById/'+${list.product.product_id}" target="_blank"
+                                       title="美康粉黛醉美唇膏 持久保湿滋润防水不掉色"
+                                       class="item-title J_MakePoint" data-point="tbcart.8.11"
+                                       th:text="${list.product.name}"></a>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="td td-price">
+                            <div class="item-price price-promo-promo">
+                                <div class="price-content" style="width: 105px;">
+                                    <div class="price-line">
+                                        <em class="price-original" th:text="${list.product.mark_price}"></em>
+                                    </div>
+                                    <div class="price-line">
+                                        <em class="J_Price price-now" tabindex="0" th:text="${list.product.price}"></em>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="td td-amount">
+                            <div class="amount-wrapper ">
+                                <div class="item-amount ">
+                                    <div class="sl">
+                                        <input class="reduce" type="button" value="-"/>
+                                        <input th:id="${list.cart_id}" th:product_id="${list.product.product_id}" class="text_box" name="" type="text"
+                                               th:value="${list.cart_count}" style="width:30px;"/>
+                                        <input class="increment" type="button" value="+"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="td td-sum">
+                            <div class="td-inner">
+                                <span tabindex="0" th:id="'total'+${list.cart_id}" th:product_id="${list.product.product_id}" class="J_ItemSum number"
+                                      th:text="${list.total_price}"></span>
+                            </div>
+                        </li>
+                        <li class="td td-op">
+                            <div class="td-inner">
+
+                                <a th:href="'/cart/delete/'+${session.viper.vip_id}+'/'+${list.cart_id}" data-point-url="#" class="delete">
+                                    删除</a>
+                            </div>
+                        </li>
+                    </ul>
+
+
+                </div>
+            </div>
+        </tr>
+        </form>
+    </div>
+    <div class="clear"></div>
+
+    <div class="float-bar-wrapper">
+        <div id="J_SelectAll2" class="select-all J_SelectAll">
+            <div class="cart-checkbox1">
+                <input class="check-all check" id="all" name="select-all" value="true" type="checkbox"
+                       style="margin-top: 2px;">
+                <label for="all"></label>
+            </div>
+            <span>全选</span>
+        </div>
+        <div class="operations">
+            <a href="#" onclick="deleteMore()" hidefocus="true" class="deleteAll">删除</a>
+
+        </div>
+        <div class="float-bar-right">
+            <div class="amount-sum">
+                <span class="txt">已选商品</span>
+                <span id="items_count">0</span><span class="txt">件</span>
+                <div class="arrow-box">
+                    <span class="selected-items-arrow"></span>
+                    <span class="arrow"></span>
+                </div>
+            </div>
+            <div class="price-sum">
+                <span class="txt">合计:</span>
+                <strong class="price">¥<span id="totalprice">0.00</span></strong>
+            </div>
+            <div class="btn-area">
+                <a onclick="creatOrder()" id="J_Go" class="submit-btn submit-btn-disabled" aria-label="请注意如果没有选择宝贝，将无法结算">
+                    <span>结&nbsp;算</span></a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+
+        <div class="footer-bd">
+            <p>
+                <a href="#">关于我们</a>
+                <a href="#">合作伙伴</a>
+                <a href="#">联系我们</a>
+                <a href="#">网站地图</a>
+                <em>© 2015-2025 版权所有. </em>
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<!--操作页面-->
+
+<div class="theme-popover-mask"></div>
+
+<div class="theme-popover">
+    <div class="theme-span"></div>
+    <div class="theme-poptit h-title">
+        <a href="javascript:;" title="关闭" class="close">×</a>
+    </div>
+    <div class="theme-popbod dform">
+        <form class="theme-signin" name="loginform" action="" method="post">
+
+            <div class="theme-signin-left">
+
+                <li class="theme-options">
+                    <div class="cart-title">颜色：</div>
+                    <ul>
+                        <li class="sku-line selected">12#川南玛瑙<i></i></li>
+                        <li class="sku-line">10#蜜橘色+17#樱花粉<i></i></li>
+                    </ul>
+                </li>
+                <li class="theme-options">
+                    <div class="cart-title">包装：</div>
+                    <ul>
+                        <li class="sku-line selected">包装：裸装<i></i></li>
+                        <li class="sku-line">两支手袋装（送彩带）<i></i></li>
+                    </ul>
+                </li>
+                <div class="theme-options">
+                    <div class="cart-title number">数量</div>
+                    <dd>
+                        <input class="min am-btn am-btn-default" name="" type="button" value="-"/>
+                        <input class="text_box" name="" type="text" value="1" style="width:30px;"/>
+                        <input class="add am-btn am-btn-default" name="" type="button" value="+"/>
+                        <span class="tb-hidden">库存<span class="stock">1000</span>件</span>
+                    </dd>
+
+                </div>
+                <div class="clear"></div>
+                <div class="btn-op">
+                    <div class="btn am-btn am-btn-warning">确认</div>
+                    <div class="btn close am-btn am-btn-warning">取消</div>
+                </div>
+
+            </div>
+            <div class="theme-signin-right">
+                <div class="img-info">
+                    <img src="/images/kouhong.jpg_80x80.jpg"/>
+                </div>
+                <div class="text-info">
+                    <span class="J_Price price-now">¥39.00</span>
+                    <span id="Stock" class="tb-hidden">库存<span class="stock">1000</span>件</span>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+<!--引导 -->
+<div class="navCir">
+    <li><a href="home2.html"><i class="am-icon-home "></i>首页</a></li>
+    <li><a href="sort.html"><i class="am-icon-list"></i>分类</a></li>
+    <li class="active"><a href="shopcart.html"><i class="am-icon-shopping-basket"></i>购物车</a></li>
+    <li><a href="index.html"><i class="am-icon-user"></i>我的</a></li>
+</div>
+</body>
+<script language="JavaScript">
+    function creatOrder() {
+        var v_id=[(${session.viper.vip_id})];
+        var ids= [];
+        $('input[name="check-sum"]:checked').each(function () {
+            ids.push($(this).attr('cart_id'));
+        });
+        $.ajax({
+            url: "/order/saveOnCart/"+v_id,
+            type: "post",
+            data: JSON.stringify(ids),
+            dataType:"json",
+            contentType:"application/json",
+            processData: false,
+            success: function (data) {
+                window.location.href="/order/findByOrderId/"+data.orderId+"/"+v_id;
+            },
+            error: function (data) {
+                alert("订单生成失败");
+            }
+        });
+    }
+    function deleteMore() {
+        var v_id=[(${session.viper.vip_id})];
+        var ids= [];
+        $('input[name="check-sum"]:checked').each(function () {
+            ids.push($(this).attr('cart_id'));
+        });
+        $.ajax({
+            url: "/cart/deleteMore/",
+            type: "delete",
+            data: JSON.stringify(ids),
+            dataType:"json",
+            contentType:"application/json",
+            processData: false,
+            success: function (data) {
+
+                if (data.status ==1){
+                    alert("删除成功！");
+                    window.location.href="/cart/findByVipId/"+v_id;
+                }
+            },
+            error: function (data) {
+                alert("删除失败！");
+            }
+        });
+    }
+</script>
+
+</html>

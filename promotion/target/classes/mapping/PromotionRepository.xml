@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gloryh.repository.PromotionRepository">
+    <resultMap id="promotion" type="com.gloryh.entity.Promotion">
+        <id property="promotion_id" column="promotion_id"></id>
+        <result column="promotion_price" property="promotion_price"></result>
+        <result property="discount" column="discount"></result>
+        <result property="count" column="count"></result>
+        <result property="state" column="state"></result>
+        <collection property="product" ofType="com.gloryh.entity.Product">
+            <id property="product_id" column="product_id"></id>
+            <result column="name" property="name"></result>
+            <result column="mark_price" property="mark_price"></result>
+            <result column="price" property="price"></result>
+            <result property="quantity" column="quantity"></result>
+            <result column="hit" property="hit"></result>
+            <result property="time" column="time"></result>
+            <result column="photo" property="photo"></result>
+            <result column="content" property="content"></result>
+            <result column="c_id" property="category.category_id"></result>
+            <result column="type_name" property="category.type_name"></result>
+        </collection>
+    </resultMap>
+    <select id="findAll" resultMap="promotion">
+        SELECT *
+        FROM product,
+             promotion,
+             category
+        WHERE promotion.p_id = product.product_id
+          AND product.c_id = category.category_id
+        LIMIT #{param1},#{param2}
+    </select>
+    <select id="findByProductId" resultType="com.gloryh.entity.Promotion">
+        SELECT *
+        FROM promotion,product,category
+        WHERE product.product_id=#{p_id} AND promotion.p_id=product.product_id AND product.c_id = category.category_id
+        <if test="type ==1">
+            AND promotion.count > 0
+        </if>
+    </select>
+    <select id="count" resultType="int">
+        SELECT COUNT(*)
+        FROM promotion
+    </select>
+    <select id="findById" parameterType="long" resultMap="promotion">
+        SELECT *
+        FROM product,
+             promotion,
+             category
+        WHERE promotion.promotion_id = #{id}
+          AND promotion.p_id = product.product_id
+          AND product.c_id = category.category_id
+    </select>
+    <select id="findByCategory" resultMap="promotion">
+        SELECT *
+        FROM product,
+             category,
+             promotion
+        WHERE category.type_name LIKE CONCAT('%', #{type_name}, '%')
+          AND product.c_id = category.category_id
+          AND promotion.p_id = product.product_id
+    </select>
+    <select id="findByProductName" resultMap="promotion">
+        SELECT *
+        FROM product,
+             category,
+             promotion
+        WHERE product.name LIKE CONCAT('%', #{name}, '%')
+          AND promotion.p_id = product.product_id
+          AND product.c_id = category.category_id
+    </select>
+    <insert id="save" parameterType="com.gloryh.entity.Promotion" useGeneratedKeys="true" keyProperty="product_id">
+        INSERT INTO promotion(p_id, promotion_price, discount, count, state)
+        VALUES (#{product.product_id}, #{promotion_price}, #{discount}, #{count}, #{state})
+    </insert>
+    <update id="update" parameterType="com.gloryh.entity.Promotion">
+        UPDATE promotion
+        SET p_id=#{product.product_id},
+            promotion_price=#{promotion_price},
+            discount=#{discount},
+            count=#{county},
+            state=#{state}
+        WHERE promotion_id = #{promotion_id}
+    </update>
+    <delete id="delete" parameterType="long">
+        DELETE
+        FROM promotion
+        WHERE promotion_id = #{id}
+    </delete>
+    <delete id="deleteMore">
+        DELETE FROM promotion
+        <where>
+            promotion_id IN
+            <foreach item="item" collection="ids" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </where>
+    </delete>
+</mapper>

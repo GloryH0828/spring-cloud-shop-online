@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>会员注册</title>
+    <link rel="stylesheet"
+          href="/AmazeUI/assets/css/amazeui.min.css"/>
+    <link href="css/dlstyle.css" rel="stylesheet"
+          type="text/css"/>
+    <script language="JavaScript" src="/basic/js/jquery-1.7.min.js"></script>
+    <script language="JavaScript" src="/AmazeUI/assets/js/amazeui.min.js"></script>
+    <script type="text/javascript">
+        function submit() {
+            var params = $("#form1").serializeArray();
+            var vipercheck = {};
+            var viper={};
+            var type = "vip";
+            for (var item in params) {
+                vipercheck[params[item].name] = params[item].value;
+            }
+            if (vipercheck["username"].length == 0) {
+                alert("请输入用户名");
+                return;
+            } else {
+                viper["username"] = vipercheck["username"];
+            }
+            var email = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9]+\.)+(com|cn|net|org)$/;
+            if(!email.test(vipercheck["email"]))
+            {
+                alert("邮箱格式不正确！请重新输入");
+                document.getElementById("email").focus();
+                return;
+            }else {
+                viper["email"]=vipercheck["email"];
+            }
+            if (vipercheck["password"].length == 0) {
+                alert("密码不得为空");
+                return;
+            }
+            if (vipercheck["passwordRepeat"]!=vipercheck["password"]){
+                alert("两次密码输入不一致");
+                return;
+            }else {
+                viper["password"] = vipercheck["password"];
+            }
+
+            $.ajax({
+                url: '/account/register',
+                data:JSON.stringify(viper) ,
+                type: 'POST',
+                dataType: 'json',
+                /*
+               声明参数位json类型，便于后台接收时可以识别
+                */
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                },
+                processData: false,
+                cache: false
+            }).done(function (data) {
+                if (data.status ==1){
+                    alert("恭喜您注册成功，即将跳转到登录页面,请前往邮箱进行账号激活!");
+                    window.location.href="login.html";
+                }
+                if (data.status == 0){
+                    alert("对不起，该用户名已被占用！");
+                }
+            });
+        }
+    </script>
+
+</head>
+
+<body>
+
+<div class="login-boxtitle">
+    <a href="home/demo.html"><img alt=""
+                                  src="/images/logobig.png"/>
+    </a>
+</div>
+
+<div class="res-banner">
+    <div class="res-main">
+        <div class="login-banner-bg">
+            <span></span><img src="/images/big.jpg"/>
+        </div>
+        <div class="login-box">
+
+            <div class="am-tabs" id="doc-my-tabs">
+                <ul class="am-tabs-nav am-nav am-nav-tabs am-nav-justify">
+                    <li class="am-active"><a href="">注册</a>
+                    </li>
+
+                </ul>
+
+                <div class="am-tabs-bd">
+                    <div class="am-tab-panel am-active">
+                        <form method="post" id="form1" action="">
+
+                            <div class="user-name">
+                                <label for="username"><i class="am-icon-user"></i>
+                                </label> <input type="text" name="username" id="username" value="" placeholder="用户名"/>
+                            </div>
+                            <div class="user-email">
+                                <label for="email"><i class="am-icon-envelope-o"></i>
+                                </label> <input type="email" name="email" id="email" value="" placeholder="请输入邮箱账号"/>
+                            </div>
+                            <div class="user-pass">
+                                <label for="password"><i class="am-icon-lock"></i>
+                                </label> <input type="password" name="password" id="password"
+                                                placeholder="设置密码"/>
+                            </div>
+                            <div class="user-pass">
+                                <label for="passwordRepeat"><i class="am-icon-lock"></i>
+                                </label> <input type="password" name="passwordRepeat" id="passwordRepeat"
+                                                placeholder="确认密码"/>
+                            </div>
+
+                        </form>
+
+                        <div class="login-links">
+                            <label for="reader-me"> <input id="reader-me"
+                                                           type="checkbox"> 点击表示您同意商城《服务协议》 </label>
+                        </div>
+                        <div class="am-cf">
+                            <input id="submit" type="button" onclick="javascript:submit()" value="注册"
+                                   class="am-btn am-btn-primary am-btn-sm am-fl">
+                        </div>
+                        <div class="login-links">
+                            <label style="color:red"> </label>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="footer ">
+
+    <div class="footer-bd ">
+        <p>
+            <a href="# ">关于我们</a> <a href="# ">合作伙伴</a> <a href="# ">联系我们</a> <a
+                href="# ">网站地图</a> <em>© 2015-2025 版权所有</em>
+        </p>
+    </div>
+</div>
+</body>
+
+</html>

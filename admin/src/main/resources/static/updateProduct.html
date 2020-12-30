@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>无标题文档</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/select.css" rel="stylesheet" type="text/css"/>
+    <script language="JavaScript" src="/js/jquery.js"></script>
+    <script language="JavaScript" src="/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.idTabs.min.js"></script>
+    <script type="text/javascript" src="/js/select-ui.min.js"></script>
+    <script type="text/javascript" src="/editor/kindeditor.js"></script>
+    <script language="JavaScript" src="/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function (e) {
+            $(".select1").uedSelect({
+                width: 345
+            });
+            $(".select2").uedSelect({
+                width: 167
+            });
+            $(".select3").uedSelect({
+                width: 100
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a>
+        </li>
+        <li><a href="#">修改商品信息</a>
+        </li>
+    </ul>
+</div>
+
+
+<div class="formbody">
+
+    <div class="formtitle">
+        <span>修改商品基本信息</span>
+    </div>
+
+    <ul class="forminfo">
+        <form id="updateForm">
+            <li><label>商品名称<b>*</b>
+            </label><input name="name" th:value="${product.name}" type="text" class="dfinput" placeholder="请填写商品名称"
+                           style="width:518px;"/>
+                <input type="hidden" name="product_id" th:value="${product.product_id}" readonly="readonly"/>
+            </li>
+
+            <li><label>商品分类<b>*</b>
+            </label>
+                <div class="vocation">
+                    <select class="select1" name="category_id">
+                        <option value="" th:text="请选择商品分类"></option>
+                        <option th:each="list:${category}" th:value="${list.category_id}"
+                                th:selected="${list.category_id == product.category.category_id}"
+                                th:text="${list.type_name}"></option>
+                    </select>
+                </div>
+            </li>
+
+            <li><label>商品封面</label>
+                <input name="photo" th:value="${product.photo}" type="hidden"/>
+                <label th:if="${product.photo == 0}" th:text="该商品没有封面"></label>
+                <img th:if="${product.photo == 1}" name="picture" th:src="'/product/'+${product.product_id}+'.jpg'"/></li>
+            <li>
+                <label>封面上传<b>*</b></label>
+                <input name="updatePicture" type="file" id="file" onchange="upload()" class="dfinput"/>
+            </li>
+            <li><label>商品价格<b>*</b>
+            </label> <input name="price" type="text" class="dfinput" th:value="${#numbers.formatDecimal(product.price,1,'COMMA',2,'POINT')}" placeholder="请填写商品价格"
+                            style="width:278px;"/>
+            </li>
+
+            <li><label>商品市场价格<b>*</b>
+            </label> <input name="mark_price" th:value="${#numbers.formatDecimal(product.mark_price,1,'COMMA',2,'POINT')}" type="text" class="dfinput"
+                            placeholder="请填写商品市场价格"
+                            style="width:278px;"/>
+            </li>
+
+            <li><label>商品数量<b>*</b>
+            </label> <input name="quantity" type="text" class="dfinput" th:value="${product.quantity}"
+                            placeholder="请填写商品数量"
+                            style="width:278px;"/>
+            </li>
+
+            <li><label>商品描述内容<b>*</b>
+            </label>
+            </li>
+            <li>
+                <textarea id="content7" name="content"
+                          style="width:700px;height:250px;" th:utext="${product.content}"></textarea>
+                <script type="text/javascript">
+                    var editor=CKEDITOR.replace('content');
+                </script>
+            </li>
+        </form>
+        <li><label>&nbsp;</label>
+            <input type="button" class="btn" onclick="submit()" value="马上发布"/>
+        </li>
+    </ul>
+
+</div>
+
+<script language="JavaScript">
+    function submit() {
+        var params = $("#updateForm").serializeArray();
+        var product = {};
+        var regPrice = /^\d+(?=\.{0,1}\d+$|$)/;
+        var regNum = /^[0-9]*$/;
+        for (var item in params) {
+            product[params[item].name] = params[item].value;
+        }
+        product["photo"]=0;
+        if (product["name"].length == 0) {
+            alert("请输入商品名称！");
+            return;
+        }
+        if (product["category_id"].length == 0) {
+            alert("请选择商品分类！");
+            return;
+        }else{
+            product["category"]={"category_id":product["category_id"]};
+        }
+        if (product["price"].length == 0) {
+            alert("请输入商品价格！");
+            return;
+        }
+        if (!regPrice.test(product["price"])) {
+            alert("请输入正确的商品价格！");
+            return false;
+        }
+        if (product["mark_price"].length == 0) {
+            alert("请输入商品市场价格！");
+            return;
+        }
+        if (!regPrice.test(product["mark_price"])) {
+            alert("请输入正确的商品市场价格！");
+            return false;
+        }
+        if (product["quantity"].length == 0) {
+            alert("请输入商品数量！");
+            return;
+        }
+        if (!regNum.test(product["quantity"])) {
+            alert("请输入正确的商品数量！");
+            return false;
+        }
+        product["content"]=editor.document.getBody().getHtml();
+        if (product["content"].length == 0) {
+            alert("请对商品进行简要描述！");
+            return;
+        }
+        $.ajax({
+            url: '/product/update',
+            data: JSON.stringify(product),
+            type: 'POST',
+            dataType: 'json',
+            /*
+           声明参数位json类型，便于后台接收时可以识别
+            */
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            processData: false,
+            cache: false
+        }).done(function (data) {
+            if (data.status == 0){
+                alert("商品信息更新成功");
+                var formData = new FormData();
+                var fileName = document.getElementById("file").value;
+                if (fileName !=""){
+                    formData.append('photo',document.getElementById("file").files[0]);
+                    $.ajax({
+                        url: "/file/upload/" +product["product_id"]+ "/2",
+                        type: "post",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            var result=JSON.parse(data);
+                            if (result.status ==1){
+                                alert("图片上传失败，您可以在商品信息修改页面重新上传!");
+                                window.location.href = "/product/findToUpdate/"+product["product_id"];
+                            }
+                            if (result.status ==0){
+                                alert("您好，新的商品封面已经上传成功");
+                                window.location.href = "/product/findToDes/"+product["product_id"];
+                            }
+
+                        },
+                        error: function (data) {
+                            alert("图片上传失败，您可以在商品信息修改页面重新上传!");
+                            window.location.href = "/product/findToUpdate/"+product["product_id"];
+                        }
+                    });
+                }else {
+                    alert("商品封面并未改变");
+                    window.location.href = "/product/findToDes/"+product["product_id"];
+                }
+            }else {
+                alert("商品信息更新失败");
+            }
+        });
+
+    }
+
+    function upload() {
+        var fileName = document.getElementById("file").value;
+        if (fileName == "") {
+            return;
+        }
+        var suffix = fileName.substr(fileName.lastIndexOf(".") + 1).toUpperCase();
+        if (suffix == "JPG" || suffix == "PNG" || suffix == "JPEG") {
+        } else {
+            alert("请选择 JPG、PNG、JPEG 格式的图片文件");
+            document.getElementById("file").value = "";
+        }
+    }
+</script>
+</body>
+</html>

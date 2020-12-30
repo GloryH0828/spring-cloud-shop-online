@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gloryh.repository.ProductRepository">
+    <resultMap id="product" type="com.gloryh.entity.Product">
+        <id property="product_id" column="product_id"></id>
+        <result column="name" property="name"></result>
+        <result column="mark_price" property="mark_price"></result>
+        <result column="price" property="price"></result>
+        <result property="quantity" column="quantity"></result>
+        <result column="hit" property="hit"></result>
+        <result property="time" column="time"></result>
+        <result column="photo" property="photo"></result>
+        <result column="content" property="content"></result>
+        <collection property="category" ofType="com.gloryh.entity.Category">
+            <id property="category_id" column="category_id"></id>
+            <result property="type_name" column="type_name"></result>
+            <result property="sort" column="sort"></result>
+        </collection>
+    </resultMap>
+    <select id="findAll" resultMap="product">
+        SELECT *
+        FROM product,
+             category
+        WHERE product.c_id = category.category_id
+        LIMIT #{param1},#{param2}
+    </select>
+    <select id="findToIndex" resultType="com.gloryh.entity.Product">
+        SELECT *
+        FROM product
+        WHERE c_id = #{category_id}
+        LIMIT 0,12
+    </select>
+    <update id="updatePhoto">
+        UPDATE product SET photo = #{state} WHERE product_id = #{id}
+    </update>
+    <select id="findByIndex" resultType="com.gloryh.entity.Product">
+        SELECT *
+        FROM product,
+             category
+        WHERE product.name LIKE CONCAT('%',#{index},'%') AND product.c_id = category.category_id
+        <if test="orderType == 1">
+            ORDER BY price ASC
+        </if>
+        <if test="orderType == 2">
+            ORDER BY price DESC
+        </if>
+        <if test="orderType ==3">
+            ORDER BY time ASC
+        </if>
+        <if test="orderType == 4">
+            ORDER BY time DESC
+        </if>
+    </select>
+    <select id="findByCategoryId" resultType="com.gloryh.entity.Product">
+        SELECT *
+        FROM product
+        WHERE  c_id = #{category_id}
+        <if test="order == 1">
+        ORDER BY price ASC
+        </if>
+        <if test="order == 2">
+        ORDER BY price DESC
+        </if>
+        <if test="order ==3">
+            ORDER BY time ASC
+        </if>
+        <if test="order == 4">
+            ORDER BY time DESC
+        </if>
+        LIMIT #{page},#{limit}
+    </select>
+    <select id="count" resultType="int">
+        SELECT COUNT(*)
+        FROM product
+    </select>
+    <select id="countByCategory" resultType="int">
+        SELECT COUNT(*)
+        FROM product WHERE c_id = #{cId}
+    </select>
+    <select id="countByName" resultType="int">
+        SELECT COUNT(*)
+        FROM product WHERE name LIKE CONCAT('%',#{name},'%')
+    </select>
+    <select id="findById" parameterType="long" resultMap="product">
+        SELECT *
+        FROM product,
+             category
+        WHERE product.product_id = #{id} AND product.c_id = category.category_id
+    </select>
+    <select id="findByCategory" resultMap="product">
+        SELECT *
+        FROM product,
+             category
+        WHERE category.type_name LIKE CONCAT('%',#{type_name},'%') AND product.c_id =category.category_id
+    </select>
+    <select id="findByName" resultMap="product">
+        SELECT *
+        FROM product,
+             category
+        WHERE product.name LIKE CONCAT('%',#{name},'%') AND product.c_id =category.category_id
+    </select>
+    <insert id="save" parameterType="com.gloryh.entity.Product" useGeneratedKeys="true" keyProperty="product_id">
+        INSERT INTO product(name, mark_price, price, quantity, hit, time, photo, c_id, content)
+        VALUES (#{name}, #{mark_price}, #{price}, #{quantity}, #{hit}, #{time}, #{photo}, #{category.category_id},
+                #{content})
+    </insert>
+    <update id="update" parameterType="com.gloryh.entity.Product">
+        UPDATE product
+        SET name=#{name},
+            mark_price=#{mark_price},
+            price=#{price},
+            quantity=#{quantity},
+            content=#{content},
+            c_id=#{category.category_id}
+        WHERE product_id = #{product_id}
+    </update>
+    <delete id="delete" parameterType="long">
+        DELETE
+        FROM product
+        WHERE product_id = #{id}
+    </delete>
+    <delete id="deleteMore">
+        DELETE FROM product
+        <where>
+            product_id IN
+            <foreach item="item" collection="ids" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </where>
+    </delete>
+</mapper>

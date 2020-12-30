@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gloryh.repository.OrderRepository">
+    <resultMap id="order" type="com.gloryh.entity.Order">
+        <id property="order_id" column="order_id"/>
+        <result property="content" column="content"/>
+        <result property="total_price" column="total_price"></result>
+        <result property="status" column="status"></result>
+        <result property="order_time" column="order_time"></result>
+        <collection property="orderItems"  ofType="com.gloryh.entity.OrderItem">
+            <id property="id" column="id"></id>
+            <result property="buy_price" column="buy_price"></result>
+            <result property="buy_count" column="buy_count"></result>
+            <association property="product" resultMap="product"></association>
+        </collection>
+        <collection property="address" ofType="com.gloryh.entity.Address">
+            <id property="address_id" column="a_id"></id>
+        </collection>
+    </resultMap>
+    <resultMap id="product" type="com.gloryh.entity.Product">
+        <id property="product_id" column="product_id"></id>
+        <result property="name" column="name"></result>
+        <result property="photo" column="photo"></result>
+        <result property="price" column="price"></result>
+    </resultMap>
+    <select id="findAll" resultMap="order">
+        SELECT * FROM `order` ,order_item,product
+        WHERE order_item.o_id = `order`.order_id
+          AND order_item.p_id = product.product_id
+        LIMIT #{index} ,#{limit}
+    </select>
+    <select id="findById" parameterType="string" resultMap="order">
+        SELECT * FROM `order` ,order_item,product
+        WHERE `order`.order_id = #{order_id}
+          AND order_item.o_id = `order`.order_id
+          AND order_item.p_id = product.product_id
+    </select>
+    <insert id="save" parameterType="com.gloryh.entity.Order">
+        INSERT INTO `order` (order_id, order_time, a_id, total_price, content, v_id, status)
+        VALUES (#{order_id},#{order_time},#{address.address_id},#{total_price},#{content},#{vip.vip_id},#{status})
+    </insert>
+    <update id="updateStatus" >
+        UPDATE `order` SET status =#{status} WHERE order_id =#{order_id}
+    </update>
+    <delete id="delete" parameterType="string">
+        DELETE FROM `order` WHERE order_id =#{order_id}
+    </delete>
+    <select id="findByVipId" parameterType="int" resultMap="order">
+        SELECT * FROM `order` ,order_item,product
+        WHERE `order`.v_id =#{v_id}
+          AND order_item.o_id = `order`.order_id
+          AND order_item.p_id = product.product_id
+    </select>
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM `order`
+    </select>
+    <update id="updateAddressById">
+        UPDATE `order` SET a_id = #{address_id} WHERE order_id = #{order_id}
+    </update>
+    
+</mapper>

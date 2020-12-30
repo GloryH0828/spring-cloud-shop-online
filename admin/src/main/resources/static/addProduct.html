@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>无标题文档</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/select.css" rel="stylesheet" type="text/css"/>
+    <script language="JavaScript" src="/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script language="JavaScript" src="/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.idTabs.min.js"></script>
+    <script type="text/javascript" src="/js/select-ui.min.js"></script>
+    <script type="text/javascript" src="/editor/kindeditor.js"></script>
+    <script type="text/javascript" src="/cal/lhgcore.js"></script>
+    <script type="text/javascript" src="/cal/lhgcalendar.js"></script>
+
+
+    <script language="JavaScript">
+        $(document).ready(function (e) {
+            $(".select1").uedSelect({
+                width: 345
+            });
+            $(".select2").uedSelect({
+                width: 167
+            });
+            $(".select3").uedSelect({
+                width: 100
+            });
+        });
+
+
+    </script>
+</head>
+
+<body>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a>
+        </li>
+        <li><a href="#">商品信息管理</a>
+        </li>
+    </ul>
+</div>
+
+<form id="form1" enctype="multipart/form-data">
+    <div class="formbody">
+        <div class="formtitle">
+            <span>商品基本信息</span>
+        </div>
+        <ul class="forminfo">
+            <li><label>商品名称<b>*</b>
+            </label> <input name="name" type="text" class="dfinput" placeholder="请填写商品名称"
+                            style="width:518px;"/>
+            </li>
+
+            <li><label>商品分类<b>*</b>
+            </label>
+                <div class="vocation">
+                    <select class="select1" name="category_id">
+                        <option value="" selected>请选择商品分类</option>
+                        <option th:each="list:${list}" th:value="${list.category_id}"
+                                th:text="${list.type_name}"></option>
+                    </select>
+                </div>
+            </li>
+
+            <li><label>商品封面<b>*</b>
+            </label> <input type="file" name="file"
+                            class="dfinput" style="width:278px;" id="filepath"/>
+            </li>
+
+            <li><label>商品价格<b>*</b>
+            </label> <input name="price" type="text" class="dfinput" placeholder="请填写商品价格"
+                            style="width:278px;"/>
+            </li>
+
+            <li><label>商品市场价格<b>*</b>
+            </label> <input name="mark_price" type="text" class="dfinput" placeholder="请填写商品市场价格"
+                            style="width:278px;"/>
+            </li>
+
+            <li><label>商品数量<b>*</b>
+            </label> <input name="quantity" type="text" class="dfinput" placeholder="请填写商品数量"
+                            style="width:278px;"/>
+            </li>
+
+            <li><label>浏览量<b>*</b> </label> <input name="hit" type="text"
+                                                   class="dfinput" placeholder="请填写浏览量" style="width:278px;"/></li>
+
+            <li><label>发布时间<b>*</b> </label> <input name="time" type="text"
+                                                    class="dfinput" placeholder="请选择时间" style="width:278px;"
+                                                    onclick="J.calendar.get();"/></li>
+
+            <li><label>商品描述内容<b>*</b>
+            </label>
+            </li>
+            <li><textarea id="content7" name="content"
+                               style="width:700px;height:250px;" ></textarea>
+                <script language="JavaScript">
+                    var editor=CKEDITOR.replace('content');
+                </script>
+            </li>
+
+        </ul>
+
+    </div>
+</form>
+<li><label>&nbsp;</label><input onclick="submit()" type="button"
+                                class="btn" value="马上发布"/>
+</li>
+<script language="JavaScript">
+    function isImage() {
+        var fileName = document.getElementById("filepath").value;
+        var suffixIndex = fileName.lastIndexOf(".");
+        var suffix = fileName.substring(suffixIndex + 1).toUpperCase();
+        if (suffix != "JPG" && suffix != "JPEG" && suffix != "PNG") {
+            return false;
+        }
+        if (fileName == null || fileName == "") {
+            return false;
+        }
+        return true;
+    }
+
+    function submit() {
+        var params = $("#form1").serializeArray();
+        var product = {};
+        var regPrice = /^\d+(?=\.{0,1}\d+$|$)/;
+        var regNum = /^[0-9]*$/;
+        var regDate = /^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/;
+        for (var item in params) {
+            product[params[item].name] = params[item].value;
+        }
+        product["photo"]=0;
+        if (product["name"].length == 0) {
+            alert("请输入商品名称！");
+            return;
+        }
+        if (product["category_id"].length == 0) {
+            alert("请选择商品分类！");
+            return;
+        }else{
+            product["category"]={"category_id":product["category_id"]};
+        }
+        if (product["price"].length == 0) {
+            alert("请输入商品价格！");
+            return;
+        }
+        if (!regPrice.test(product["price"])) {
+            alert("请输入正确的商品价格！");
+            return false;
+        }
+        if (product["mark_price"].length == 0) {
+            alert("请输入商品市场价格！");
+            return;
+        }
+        if (!regPrice.test(product["mark_price"])) {
+            alert("请输入正确的商品市场价格！");
+            return false;
+        }
+        if (product["quantity"].length == 0) {
+            alert("请输入商品数量！");
+            return;
+        }
+        if (!regNum.test(product["quantity"])) {
+            alert("请输入正确的商品数量！");
+            return false;
+        }
+        if (product["hit"].length == 0) {
+            alert("请输入商品浏览量！");
+            return;
+        }
+        if (!regNum.test(product["hit"])) {
+            alert("请输入正确的商品浏览量！");
+            return false;
+        }
+        if (product["time"].length == 0) {
+            alert("请输入商品发布时间！");
+            return;
+        }
+        if (!regDate.test(product["time"])) {
+            alert("请输入正确的商品发布时间！");
+            return false;
+        }
+
+        product["content"]=editor.document.getBody().getHtml();
+        if (product["content"].length == 0) {
+            alert("请对商品进行简要描述！");
+            return;
+        }
+        var formData = new FormData();
+        var fileName = document.getElementById("filepath").value;
+        var suffix = fileName.split('.').pop().toLowerCase();
+        if (isImage(suffix.toUpperCase())) {
+            product["photo"]=1;
+        } else {
+            alert("对不起，请上传JPG、PNG、JPEG格式的图片！");
+            return;
+        }
+
+        $.ajax({
+            url: '/product/save',
+            data: JSON.stringify(product),
+            type: 'POST',
+            dataType: 'json',
+            /*
+           声明参数位json类型，便于后台接收时可以识别
+            */
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            processData: false,
+            cache: false
+        }).done(function (data) {
+            var status = data.status;
+            var id = data.id;
+            //alert(status);
+            if (status == 0) {
+                formData.append('photo', document.getElementById("filepath").files[0]);
+                $.ajax({
+                    url: "/file/upload/" +id+ "/2",
+                    type: "post",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        var result=JSON.parse(data);
+                        if (result.status ==1){
+                            alert("图片上传失败，您可以在商品信息修改页面重新上传!");
+                        }
+                        if (result.status ==0){
+                            alert("您好，新的商品已经发布成功");
+                            window.location.href = "/product/findToDes/"+id;
+                        }
+                    },
+                    error: function (data) {
+                        alert("图片上传失败，您可以在商品信息修改页面重新上传!");
+                    }
+                });
+
+            } else {
+                alert("商品发布失败！");
+            }
+        });
+    }
+</script>
+</body>
+</html>

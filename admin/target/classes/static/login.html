@@ -1,0 +1,118 @@
+﻿<!DOCTYPE>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎登录后台管理系统</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css"/>
+    <script language="JavaScript" src="js/jquery.js"></script>
+    <script src="js/cloud.js" type="text/javascript"></script>
+    <script language="JavaScript" src="js/jquery-1.7.min.js"></script>
+    <script language="javascript">
+        $(function () {
+            $('.loginbox').css({
+                'position': 'absolute',
+                'left': ($(window).width() - 692) / 2
+            });
+            $(window).resize(function () {
+                $('.loginbox').css({
+                    'position': 'absolute',
+                    'left': ($(window).width() - 692) / 2
+                });
+            });
+        });
+
+        function submit() {
+            var params = $("#form1").serializeArray();
+            var admin = {};
+            var username;
+            var password;
+            for (var item in params) {
+                admin[params[item].name] = params[item].value;
+            }
+            if (admin["username"].length == 0) {
+                alert("请输入用户名");
+                return;
+            } else {
+                username = admin["username"];
+            }
+
+            if (admin["password"].length == 0) {
+                alert("密码不得为空");
+                return;
+            } else {
+                password = admin["password"];
+            }
+            $.ajax({
+                url: '/account/login/' + username+'/'+password,
+                data: '',
+                type: 'POST',
+                dataType: 'json',
+                /*
+               声明参数位json类型，便于后台接收时可以识别
+                */
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                },
+                processData: false,
+                cache: false
+            }).done(function (data) {
+                var status=data.status;
+                var name=data.name;
+                //alert(status);
+                if (status==0){
+                    alert("您好"+name +",恭喜您登陆成功，即将跳转到主页!");
+                    window.location.href="account/redirect/main";
+                }else if(status==1){
+                    alert("信息输入有误，请重新输入！");
+                }
+            });
+        }
+    </script>
+
+</head>
+
+<body
+        style="background-color:#1c77ac; background-image:url(images/light.png); background-repeat:no-repeat; background-position:center top; overflow:hidden;">
+
+<div id="mainBody">
+    <div id="cloud1" class="cloud"></div>
+    <div id="cloud2" class="cloud"></div>
+</div>
+
+<div class="logintop">
+    <span>欢迎登录后台管理界面平台</span>
+    <ul>
+        <li><a href="#">回首页</a>
+        </li>
+        <li><a href="#">帮助</a>
+        </li>
+        <li><a href="#">关于</a>
+        </li>
+    </ul>
+</div>
+
+<div class="loginbody">
+
+    <span class="systemlogo"></span>
+
+    <div class="loginbox">
+        <ul>
+            <form id="form1">
+            <li><input id="username" name="username" type="text" class="loginuser" placeholder="请输入用户名"/>
+            </li>
+            <li><input id="password" name="password" type="password" class="loginpwd" placeholder="请输入密码"/>
+            </li>
+            </form>
+            <li><input id="login" type="button" class="loginbtn" value="登录" onclick="javascript:submit()"/>
+                <label><input name="" type="checkbox" value="" checked="checked"/>记住密码</label>
+                <label><a href="#">忘记密码？</a></label>
+            </li>
+        </ul>
+    </div>
+
+</div>
+
+<div class="loginbm">版权所有</div>
+</body>
+</html>

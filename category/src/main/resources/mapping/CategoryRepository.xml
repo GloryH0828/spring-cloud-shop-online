@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gloryh.repository.CategoryRepository">
+    <select id="findAll" resultType="com.gloryh.entity.Category">
+        SELECT *
+        FROM category
+        LIMIT #{param1},#{param2}
+    </select>
+    <select id="findByName" resultType="com.gloryh.entity.Category">
+        SELECT * FROM category
+        WHERE type_name = #{type_name}
+    </select>
+    <select id="findAllNoPage" resultType="com.gloryh.entity.Category">
+        SELECT *
+        FROM category
+    </select>
+    <select id="count" resultType="int">
+        SELECT COUNT(*)
+        FROM category
+    </select>
+    <select id="findById" parameterType="long" resultType="com.gloryh.entity.Category">
+        SELECT *
+        FROM category
+        WHERE category_id = #{id}
+    </select>
+    <insert id="save" parameterType="com.gloryh.entity.Category">
+        INSERT INTO category(type_name)
+        VALUES (#{type_name})
+    </insert>
+    <update id="update" parameterType="com.gloryh.entity.Category">
+        UPDATE category
+        SET type_name=#{type_name},
+            sort=#{sort}
+        WHERE category_id = #{category_id}
+    </update>
+    <delete id="delete" parameterType="long">
+        DELETE
+        FROM category
+        WHERE category_id = #{id}
+    </delete>
+    <delete id="deleteMore">
+        DELETE FROM category
+        <where>
+            category_id IN
+            <foreach item="item" collection="ids" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </where>
+    </delete>
+</mapper>

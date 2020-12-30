@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>商品页面</title>
+    <link href="/AmazeUI/assets/css/amazeui.css" rel="stylesheet" type="text/css"/>
+    <link href="/AmazeUI/assets/css/admin.css" rel="stylesheet" type="text/css"/>
+    <link href="/basic/css/demo.css" rel="stylesheet" type="text/css"/>
+    <link type="text/css" href="/css/optstyle.css" rel="stylesheet"/>
+    <link type="text/css" href="/css/style.css" rel="stylesheet"/>
+    <script type="text/javascript" src="/basic/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="/basic/js/quick_links.js"></script>
+    <script type="text/javascript" src="/js/script.js"></script>
+    <script type="text/javascript" src="/AmazeUI/assets/js/amazeui.js"></script>
+    <script type="text/javascript" src="/js/jquery.imagezoom.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.flexslider.js"></script>
+    <script type="text/javascript" src="/js/list.js"></script>
+    <script language="JavaScript">
+        function search() {
+            var index=document.getElementById("searchInput").value;
+            if (index.length == 0){
+                alert("关键字不能为空！");
+                return;
+            }else {
+                window.location.href="/product/findByIndex/"+index+"/1";
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+
+<!--顶部导航条 -->
+<div class="am-container header">
+    <ul class="message-l">
+        <div class="topMessage">
+            <div class="menu-hd" th:if="${session.viper == null || session.viper.vip_id == 0 }">
+                <a href="/login.html" target="_top" class="h">亲，请登录</a>
+                <a href="/register.html" target="_top">免费注册</a>
+            </div>
+            <div class="menu-hd" th:if="${session.viper.vip_id != 0}">
+                <b th:if="${session.viper.name != null}"
+                   th:text="${session.viper.name}+'('+${session.viper.username}+')'"></b>
+                <b th:if="${session.viper.name == null}" th:text="'null('+${session.viper.username}+')'"></b>
+                <a href="/account/logout" th:text="退出登录"></a>
+            </div>
+        </div>
+    </ul>
+    <ul class="message-r">
+        <div class="topMessage home">
+            <div class="menu-hd"><a href="/index.html" target="_top" class="h">商城首页</a></div>
+        </div>
+        <div class="topMessage my-shangcheng">
+            <div class="menu-hd MyShangcheng"><a href="#" target="_top"><i class="am-icon-user am-icon-fw"></i>个人中心</a>
+            </div>
+        </div>
+        <div class="topMessage mini-cart">
+            <div class="menu-hd"><a id="mc-menu-hd" th:href="'/cart/findByVipId/'+${session.viper.vip_id}"target="_top"><i
+                    class="am-icon-shopping-cart  am-icon-fw"></i><span>购物车</span><strong id="J_MiniCartNum"
+                                                                                          class="h">0</strong></a></div>
+        </div>
+        <div class="topMessage favorite">
+            <div class="menu-hd"><a href="#" target="_top"><i class="am-icon-heart am-icon-fw"></i><span>收藏夹</span></a>
+            </div>
+    </ul>
+</div>
+
+<!--悬浮搜索框-->
+
+<div class="nav white">
+    <div class="logo"><img src="/images/logo.png"/></div>
+    <div class="logoBig">
+        <li><img src="/images/logobig.png"/></li>
+    </div>
+    <div class="search-bar pr">
+        <a name="index_none_header_sysc" href="#"></a>
+        <form>
+            <input id="searchInput" name="index_none_header_sysc" type="text" placeholder="搜索" autocomplete="off">
+            <input id="ai-topsearch" class="submit am-btn" value="搜索" index="1" onclick="search();" type="button">
+        </form>
+    </div>
+</div>
+
+<div class="clear"></div>
+<b class="line"></b>
+<div class="listMain">
+
+    <!--分类-->
+    <div class="nav-table">
+        <div class="long-title"><span class="all-goods">全部分类</span></div>
+        <div class="nav-cont">
+            <ul>
+                <li class="index"><a href="/index.html">首页</a></li>
+                <li class="qc"><a href="#">闪购</a></li>
+                <li class="qc"><a href="#">限时抢</a></li>
+                <li class="qc"><a href="#">团购</a></li>
+                <li class="qc last"><a href="#">大包装</a></li>
+            </ul>
+
+        </div>
+    </div>
+    <ol class="am-breadcrumb am-breadcrumb-slash">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">分类</a></li>
+        <li class="am-active">内容</li>
+    </ol>
+    <script type="text/javascript">
+        $(function () {
+        });
+        $(window).load(function () {
+            $('.flexslider').flexslider({
+                animation: "slide",
+                start: function (slider) {
+                    $('body').removeClass('loading');
+                }
+            });
+        });
+    </script>
+
+    <!--放大镜-->
+
+    <div class="item-inform">
+        <div class="clearfixLeft" id="clearcontent">
+
+            <div class="box">
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $(".jqzoom").imagezoom();
+                        $("#thumblist li a").click(function () {
+                            $(this).parents("li").addClass("tb-selected").siblings().removeClass("tb-selected");
+                            $(".jqzoom").attr('src', $(this).find("img").attr("mid"));
+                            $(".jqzoom").attr('rel', $(this).find("img").attr("big"));
+                        });
+                    });
+                </script>
+
+                <div class="tb-booth tb-pic tb-s310">
+                    <a th:href="'/product/'+${product.product_id}+'.jpg'"><img
+                            th:src="'/product/'+${product.product_id}+'.jpg'" alt="细节展示放大镜特效"
+                            th:rel="'/product/'+${product.product_id}+'.jpg'"
+                            class="jqzoom"/></a>
+                </div>
+
+            </div>
+
+            <div class="clear"></div>
+        </div>
+
+        <div class="clearfixRight">
+
+
+            <div class="tb-detail-hd">
+                <h1 th:text="${product.name}">
+                </h1>
+                直发，品质保障，赠原装硬底座，支持二次开发，批量采购咨询客服，免费开增值税发票。
+                直发，品质保障，赠原装硬底座，支持二次开发，批量采购咨询客服，免费开增值税发票。
+                直发，品质保障，赠原装硬底座，支持二次开发，批量采购咨询客服，免费开增值税发票。
+            </div>
+            <div class="tb-detail-list">
+                <!--价格-->
+                <div class="tb-detail-price">
+                    <li class="price iteminfo_price">
+                        <dt>促销价</dt>
+                        <dd th:if="${promotion == null}">
+                            <em>¥</em>
+                            <input th:id="price" th:value="${product.price}" type="hidden"/>
+                            <b class="sys_item_price"
+                               th:text="${#numbers.formatDecimal(product.price,1,'COMMA',2,'POINT')}"></b>
+                        </dd>
+                        <dd th:if="${promotion != null}">
+                            <em>¥</em>
+                            <b class="sys_item_price" th:id="price"
+                               th:text="${#numbers.formatDecimal(promotion,1,'COMMA',2,'POINT')}"></b>
+                        </dd>
+                    </li>
+                    <li class="price iteminfo_mktprice">
+                        <dt>原价</dt>
+                        <dd><em>¥</em><b class="sys_item_mktprice" th:text="${product.mark_price}"></b></dd>
+                    </li>
+                    <div class="clear"></div>
+                </div>
+
+                <div class="clear"></div>
+
+                <!--销量-->
+                <ul class="tm-ind-panel">
+                    <li class="tm-ind-item tm-ind-sellCount canClick">
+                        <div class="tm-indcon"><span class="tm-label">库存量</span><span class="tm-count"
+                                                                                      th:text="${product.quantity}"></span>
+                        </div>
+                    </li>
+                    <li class="tm-ind-item tm-ind-sellCount canClick">
+
+                    </li>
+                    <li class="tm-ind-item tm-ind-sellCount canClick">
+
+                    </li>
+                </ul>
+                <ul class="tm-ind-panel">
+                    <li class="tm-ind-item tm-ind-sellCount canClick">
+                        <div class="tm-indcon"><span class="tm-label">浏览量</span><span class="tm-count"
+                                                                                      th:text="${product.hit}"></span>
+                        </div>
+                    </li>
+                    <li class="tm-ind-item tm-ind-sellCount canClick">
+
+                    </li>
+                    <li class="tm-ind-item tm-ind-sellCount canClick">
+
+                    </li>
+                </ul>
+                <div class="clear"></div>
+
+                <!--各种规格-->
+                <dl class="iteminfo_parameter sys_item_specpara">
+
+                    <dd>
+                        <!--操作页面-->
+
+                        <div class="theme-popover-mask"></div>
+
+                        <div class="theme-popover">
+
+                            <div class="theme-popbod dform">
+                                <form class="theme-signin" name="loginform" action="" method="post">
+                                    <div class="theme-signin-left">
+
+                                        <div class="theme-options">
+
+                                            <div class="cart-title number">数量</div>
+                    <dd>
+                        <input id="min" class="am-btn am-btn-default" name="" type="button" value="-"/>
+                        <input id="text_box" name="quantity" type="text" value="1" style="width:30px;"/>
+                        <input id="add" class="am-btn am-btn-default" name="" type="button" value="+"/>
+
+                    </dd>
+
+            </div>
+            <div class="clear"></div>
+
+            <div class="btn-op">
+                <div class="btn am-btn am-btn-warning">确认</div>
+                <div class="btn close am-btn am-btn-warning">取消</div>
+            </div>
+        </div>
+        <div class="theme-signin-right">
+            <div class="img-info">
+                <img src="/images/songzi.jpg"/>
+            </div>
+            <div class="text-info">
+                <span class="J_Price price-now">¥39.00</span>
+                <span id="Stock" class="tb-hidden">库存<span class="stock">1000</span>件</span>
+            </div>
+        </div>
+
+        </form>
+    </div>
+</div>
+
+</dd>
+</dl>
+<div class="clear"></div>
+<!--活动	-->
+<div class="shopPromotion gold">
+    <div class="hot">
+        <dt class="tb-metatit">店铺优惠</dt>
+        <div class="gold-list">
+            <p>双十一买一送二啦！</p>
+        </div>
+    </div>
+    <div class="clear"></div>
+
+</div>
+</div>
+
+<div class="pay">
+    <div class="pay-opt">
+        <a href="home.html"><span class="am-icon-home am-icon-fw">首页</span></a>
+        <a><span class="am-icon-heart am-icon-fw">收藏</span></a>
+
+    </div>
+    <li>
+        <div class="clearfix tb-btn tb-btn-buy theme-login">
+            <a id="LikBuy" onclick="buy()" title="点此按钮到下一步确认购买信息" href="#">立即购买</a>
+        </div>
+    </li>
+    <li>
+        <div class="clearfix tb-btn tb-btn-basket theme-login">
+            <a id="LikBasket" title="加入购物车" onclick="addCart()"><i></i>加入购物车</a>
+        </div>
+    </li>
+</div>
+
+</div>
+
+<div class="clear"></div>
+
+</div>
+
+</div>
+<div class="introduce">
+
+    <div class="clear"></div>
+    <div class="introduceMain">
+        <div class="am-tabs" data-am-tabs>
+
+            <ul class="am-avg-sm-3 am-tabs-nav am-nav am-nav-tabs">
+                <li class="am-active">
+                    <a href="#">
+
+                        <span class="index-needs-dt-txt">宝贝详情</span></a>
+
+                </li>
+            </ul>
+            <div class="am-tabs-bd">
+                <div class="am-tab-panel am-fade am-in am-active" th:utext="${product.content}">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+</div>
+
+<div class="footer">
+
+    <div class="footer-bd">
+        <p>
+            <a href="#">关于我们</a>
+            <a href="#">合作伙伴</a>
+            <a href="#">联系我们</a>
+            <a href="#">网站地图</a>
+            <em>© 2015-2025 版权所有. </em>
+        </p>
+    </div>
+</div>
+
+
+</div>
+</div>
+<script language="JavaScript">
+    function buy() {
+        var productId = [(${product.product_id})];
+        var vip_id = [(${session.viper.vip_id})];
+        if (vip_id == 0) {
+            alert("请您先完成登录");
+            window.location.href = "/login.html";
+        } else {
+            var quantity = document.getElementById("text_box").value;
+            var price = document.getElementById("price").value;
+            var cart = {};
+            var vip = {};
+            var product = {};
+            product["product_id"] = productId;
+            vip["vip_id"] = vip_id;
+            cart["cart_count"] = quantity;
+            cart["product"] = product;
+            cart["vip"] = vip;
+            $.ajax({
+                url: "/order/creat/",
+                type: "post",
+                data: JSON.stringify(cart),
+                dataType: "json",
+                contentType: "application/json",
+                processData: false,
+                success: function (data) {
+                    window.location.href = "/order/findByOrderId/" + data.orderId + "/" + vip_id;
+                },
+                error: function (data) {
+                    alert("订单生成失败！");
+                }
+            });
+        }
+    }
+
+    function addCart() {
+        var productId = [(${product.product_id})];
+        var vip_id = [(${session.viper.vip_id})];
+        if (vip_id == 0) {
+            alert("请您先完成登录");
+            window.location.href = "/login.html";
+        } else {
+            var quantity = document.getElementById("text_box").value;
+            var price = document.getElementById("price").value;
+            var cart = {};
+            var vip = {};
+            var product = {};
+            product["product_id"] = productId;
+            product["price"] = price;
+            vip["vip_id"] = vip_id;
+            cart["cart_count"] = quantity;
+            cart["product"] = product;
+            cart["vip"] = vip;
+            $.ajax({
+                url: "/cart/save/",
+                type: "post",
+                data: JSON.stringify(cart),
+                dataType: "json",
+                contentType: "application/json",
+                processData: false,
+                success: function (data) {
+
+                    if (data.status == 1) {
+                        alert("加入购物车成功！");
+                    }
+                },
+                error: function (data) {
+                    alert("加入购物车失败！");
+                }
+            });
+        }
+
+    }
+</script>
+
+</body>
+
+</html>

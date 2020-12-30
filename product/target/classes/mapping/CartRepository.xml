@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gloryh.repository.CartRepository">
+    <resultMap id="cart" type="com.gloryh.entity.Cart">
+        <id property="cart_id" column="cart_id"></id>
+        <result column="cart_count" property="cart_count"></result>
+        <result column="total_price" property="total_price"></result>
+        <collection property="vip" ofType="com.gloryh.entity.Vip">
+            <id property="vip_id" column="vip_id"></id>
+            <result property="username" column="username"></result>
+        </collection>
+        <collection property="product" ofType="com.gloryh.entity.Product">
+            <id property="product_id" column="product_id"></id>
+            <result property="name" column="name"></result>
+            <result property="mark_price" column="mark_price"></result>
+            <result property="price" column="price"></result>
+        </collection>
+    </resultMap>
+
+    <select id="findById" parameterType="int" resultMap="cart">
+        SELECT c.*,p.product_id,p.mark_price,p.name,p.mark_price,v.username,v.vip_id
+        FROM cart AS c,
+             vip AS v ,
+             product AS p
+        WHERE c.cart_id=#{cartId} AND c.p_id=p.product_id AND c.v_id=v.vip_id
+    </select>
+    <select id="findByProductId" parameterType="long" resultMap="cart">
+        SELECT c.*,p.product_id,p.mark_price,p.name,p.mark_price,v.username,v.vip_id
+        FROM cart AS c,
+             vip AS v ,
+             product AS p
+        WHERE c.p_id=#{productId} AND c.p_id=p.product_id AND c.v_id=v.vip_id
+    </select>
+    <select id="findByVipId" parameterType="int" resultMap="cart">
+        SELECT c.*,p.product_id,p.price,p.name,p.mark_price,v.username,v.vip_id
+        FROM cart AS c,
+             vip AS v ,
+             product AS p
+        WHERE c.v_id=#{vipId} AND c.p_id=p.product_id AND c.v_id=v.vip_id
+    </select>
+    <insert id="saveCart" parameterType="com.gloryh.entity.Cart" >
+        INSERT INTO cart(p_id, cart_count, v_id,total_price)
+        VALUES (#{product.product_id}, #{cart_count}, #{vip.vip_id},#{total_price})
+    </insert>
+    <update id="updateCart" parameterType="com.gloryh.entity.Cart">
+        UPDATE cart
+        SET cart_count=#{cart_count},total_price=#{total_price}
+        WHERE cart_id = #{cart_id}
+    </update>
+    <delete id="deleteCart" parameterType="int">
+        DELETE
+        FROM cart
+        WHERE cart_id = #{cartId}
+    </delete>
+    <delete id="deleteMore">
+        DELETE FROM cart
+        <where>
+            cart_id IN
+            <foreach item="item" collection="ids" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </where>
+    </delete>
+</mapper>

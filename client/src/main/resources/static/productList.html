@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>搜索页面</title>
+
+    <link href="/AmazeUI/assets/css/amazeui.css" rel="stylesheet" type="text/css"/>
+    <link href="/AmazeUI/assets/css/admin.css" rel="stylesheet" type="text/css"/>
+    <link href="/basic/css/demo.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/seastyle.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/basic/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="/js/script.js"></script>
+    <script language="JavaScript">
+        function search() {
+            var index=document.getElementById("searchInput").value;
+            if (index.length == 0){
+                alert("关键字不能为空！");
+                return;
+            }else {
+                window.location.href="/product/findByIndex/"+index+"/1";
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+<!--顶部导航条 -->
+<div class="am-container header">
+    <ul class="message-l">
+        <div class="topMessage">
+            <div class="menu-hd" th:if="${session.viper == null || session.viper.vip_id == 0 }">
+                <a href="/login.html" target="_top" class="h">亲，请登录</a>
+                <a href="/register.html" target="_top">免费注册</a>
+            </div>
+            <div class="menu-hd" th:if="${session.viper.vip_id != 0}">
+                <b th:if="${session.viper.name != null}"
+                   th:text="${session.viper.name}+'('+${session.viper.username}+')'"></b>
+                <b th:if="${session.viper.name == null}" th:text="'null('+${session.viper.username}+')'"></b>
+                <a href="/account/logout" th:text="退出登录"></a>
+            </div>
+        </div>
+    </ul>
+    <ul class="message-r">
+        <div class="topMessage home">
+            <div class="menu-hd"><a href="/index.html" target="_top" class="h">商城首页</a></div>
+        </div>
+        <div class="topMessage my-shangcheng">
+            <div class="menu-hd MyShangcheng"><a href="#" target="_top"><i class="am-icon-user am-icon-fw"></i>个人中心</a>
+            </div>
+        </div>
+        <div class="topMessage mini-cart">
+            <div class="menu-hd"><a id="mc-menu-hd" th:href="'/cart/findByVipId/'+${session.viper.vip_id}" target="_top"><i
+                    class="am-icon-shopping-cart  am-icon-fw"></i><span>购物车</span><strong id="J_MiniCartNum"
+                                                                                          class="h">0</strong></a></div>
+        </div>
+        <div class="topMessage favorite">
+            <div class="menu-hd"><a href="#" target="_top"><i class="am-icon-heart am-icon-fw"></i><span>收藏夹</span></a>
+            </div>
+    </ul>
+</div>
+
+<!--悬浮搜索框-->
+
+<div class="nav white">
+    <div class="logo"><img src="/images/logobig.png"/></div>
+    <div class="logoBig">
+        <li><img src="/images/logobig.png"/></li>
+    </div>
+
+    <div class="search-bar pr">
+        <a name="index_none_header_sysc" href="#"></a>
+        <form>
+            <input id="searchInput" name="index_none_header_sysc" type="text" th:value="${index}" placeholder="搜索" autocomplete="off">
+            <input id="ai-topsearch" class="submit am-btn" value="搜索" onclick="search()" index="1" type="button">
+        </form>
+    </div>
+</div>
+
+<div class="clear"></div>
+<b class="line"></b>
+<div class="search">
+    <div class="search-list">
+        <div class="nav-table">
+            <div class="long-title"><span class="all-goods">全部分类</span></div>
+            <div class="nav-cont">
+                <ul>
+                    <li class="index"><a href="/index.html">首页</a></li>
+                    <li class="qc"><a href="#">闪购</a></li>
+                    <li class="qc"><a href="#">限时抢</a></li>
+                    <li class="qc"><a href="#">团购</a></li>
+                    <li class="qc last"><a href="#">大包装</a></li>
+                </ul>
+
+            </div>
+        </div>
+
+        <div class="am-g am-g-fixed" th:if="${index != null}">
+            <div class="am-u-sm-12 am-u-md-12">
+
+                <!--<div class="search-content">-->
+                <div class="sort">
+                    <li class="first" th:if="${orderType ==1}"><a title="综合"
+                                                                  th:href="'/product/findByIndex/'+${index}+'/1'">价格升序</a>
+                    </li>
+                    <li th:if="${orderType !=1}"><a
+                            th:href="'/product/findByIndex/'+${index}+'/1'">价格升序</a></li>
+                    <li th:if="${orderType ==2}" class="first"><a title="销量"
+                                                                  th:href="'/product/findByIndex/'+${index}+'/2'">价格降序</a>
+                    </li>
+                    <li th:if="${orderType !=2}"><a
+                            th:href="'/product/findByIndex/'+${index}+'/2'">价格降序</a></li>
+                    <li th:if="${orderType !=3}"><a
+                            th:href="'/product/findByIndex/'+${index}+'/3'">上架时间升序</a></li>
+                    <li class="first" th:if="${orderType ==3}"><a
+                            th:href="'/product/findByIndex/'+${index}+'/3'">上架时间升序</a></li>
+                    <li class="first" th:if="${orderType ==4}"><a
+                            th:href="'/product/findByIndex/'+${index}+'/4'">上架时间降序</a></li>
+                    <li th:if="${orderType !=4}"><a
+                            th:href="'/product/findByIndex/'+${index}+'/4'">上架时间降序</a></li>
+                </div>
+                <div class="clear"></div>
+
+                <ul class="am-avg-sm-2 am-avg-md-3 am-avg-lg-4 boxes">
+                    <li th:each="products:${list}">
+                        <a th:href="'/product/findById/'+${products.product_id}">
+                            <div class="i-pic limit">
+                                <img th:src="'/product/'+${products.product_id}+'.jpg'"
+                                     style="height: 278px; width: 278px;"/>
+                                <p class="title fl" th:text="${products.name}"></p>
+                                <p class="price fl">
+                                    <b>¥</b>
+                                    <strong th:text="${#numbers.formatDecimal(products.price,1,'COMMA',2,'POINT')}"></strong>
+                                </p>
+                                <p class="number fl">
+                                    销量<span>1110</span>
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+                <!--</div>-->
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="am-g am-g-fixed" th:if="${index == null}">
+            <div class="am-u-sm-12 am-u-md-12">
+
+                <!--<div class="search-content">-->
+                <div class="sort">
+                    <li class="first" th:if="${orderType ==1}"><a title="综合"
+                                                                  th:href="'/product/findByCategoryId/1/'+${category_id}+'/1'">价格升序</a>
+                    </li>
+                    <li th:if="${orderType !=1}"><a
+                            th:href="'/product/findByCategoryId/1/'+${category_id}+'/1'">价格升序</a></li>
+                    <li th:if="${orderType ==2}" class="first"><a title="销量"
+                                                                  th:href="'/product/findByCategoryId/2/'+${category_id}+'/1'">价格降序</a>
+                    </li>
+                    <li th:if="${orderType !=2}"><a
+                            th:href="'/product/findByCategoryId/2/'+${category_id}+'/1'">价格降序</a></li>
+                    <li th:if="${orderType !=3}"><a
+                            th:href="'/product/findByCategoryId/3/'+${category_id}+'/1'">上架时间升序</a></li>
+                    <li class="first" th:if="${orderType ==3}"><a
+                            th:href="'/product/findByCategoryId/3/'+${category_id}+'/1'">上架时间升序</a></li>
+                    <li class="first" th:if="${orderType ==4}"><a
+                            th:href="'/product/findByCategoryId/4/'+${category_id}+'/1'">上架时间降序</a></li>
+                    <li th:if="${orderType !=4}"><a
+                            th:href="'/product/findByCategoryId/4/'+${category_id}+'/1'">上架时间降序</a></li>
+                </div>
+                <div class="clear"></div>
+
+                <ul class="am-avg-sm-2 am-avg-md-3 am-avg-lg-4 boxes">
+                    <li th:each="products:${page.list}">
+                        <a th:href="'/product/findById/'+${products.product_id}">
+                            <div class="i-pic limit">
+                                <img th:src="'/product/'+${products.product_id}+'.jpg'"
+                                     style="height: 278px; width: 278px;"/>
+                                <p class="title fl" th:text="${products.name}"></p>
+                                <p class="price fl">
+                                    <b>¥</b>
+                                    <strong th:text="${#numbers.formatDecimal(products.price,1,'COMMA',2,'POINT')}"></strong>
+                                </p>
+                                <p class="number fl">
+                                    销量<span>1110</span>
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+                <!--</div>-->
+
+                <div class="clear"></div>
+                <!--分页 -->
+                <ul class="am-pagination am-pagination-right" th:if="${page.totalPage - page.currentPage ge 5}">
+                    <li class="am-disabled" th:if="${page.currentPage ==1}"><a href="#">&laquo;</a></li>
+                    <li class="am-disabled" th:if="${page.currentPage !=1}">
+                        <a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.currentPage -1}">
+                            &laquo;
+                        </a>
+                    </li>
+                    <li class="am-active">
+                        <a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.currentPage }"
+                           th:text="${page.currentPage }">
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.currentPage +1}"
+                           th:text="${page.currentPage +1}">
+
+                        </a>
+                    </li>
+                    <li><a href="javascript:;">...</a>
+                    </li>
+                    <li>
+                        <a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.totalPage -1 }"
+                           th:text="${page.totalPage -1}">
+
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.totalPage }"
+                           th:text="${page.totalPage}">
+
+                        </a>
+                    </li>
+                    <li class="am-disabled" th:if="${page.currentPage == page.totalPage}"><a href="#">&laquo;</a></li>
+                    <li class="am-disabled" th:if="${page.currentPage != page.totalPage}"><a
+                            th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.currentPage +1}">&laquo;</a>
+                    </li>
+
+                </ul>
+                <ul class="am-pagination am-pagination-right" th:if="${page.totalPage le 5} ">
+                    <li th:class="${page.currentPage == 1}? 'am-active'" th:if="${page.totalPage - 1 ge 0}"><a
+                            th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/1'" th:text="1">
+                    </a>
+                    <li th:class="${page.currentPage == 2}? 'am-active'" th:if="${page.totalPage - 2 ge 0}"><a
+                            th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/2'" th:text="2">
+                    </a>
+                    <li th:class="${page.currentPage == 3}? 'am-active'" th:if="${page.totalPage - 3 ge 0}"><a
+                            th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/3'" th:text="3">
+                    </a>
+                    <li th:class="${page.currentPage == 4}? 'am-active'" th:if="${page.totalPage - 4 ge 0}"><a
+                            th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/4'" th:text="4">
+                    </a>
+                    <li th:class="${page.currentPage == 5}? 'am-active'" th:if="${page.totalPage - 5 ge 0}"><a
+                            th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/5'" th:text="5">
+                    </a>
+                    </li>
+
+                </ul>
+                <ul class="am-pagination am-pagination-right"
+                    th:if="${page.totalPage - page.currentPage lt 5 && page.totalPage gt 5}">
+                    <li class="am-disabled">
+                        <a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.currentPage -1}">
+                            &laquo;
+                        </a>
+                    </li>
+                    <li ><a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.totalPage -4}"
+                                             th:text="${page.totalPage -4}">
+                    </a>
+                    <li ><a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.totalPage -3}"
+                                             th:text="${page.totalPage -3}">
+                    </a>
+                    <li ><a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.totalPage -2}"
+                                             th:text="${page.totalPage -2}">
+                    </a>
+                    <li ><a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.totalPage -1}"
+                                             th:text="${page.totalPage -1}">
+                    </a>
+                    <li ><a th:href="'/product/findByCategoryId/'+${orderType}+'/'+${category_id}+'/'+${page.totalPage}"
+                                             th:text="${page.totalPage}">
+                    </a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+        <div class="footer">
+
+            <div class="footer-bd">
+                <p>
+                    <a href="#">关于我们</a>
+                    <a href="#">合作伙伴</a>
+                    <a href="#">联系我们</a>
+                    <a href="#">网站地图</a>
+                    <em>© 2015-2025 版权所有. </em>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    window.jQuery || document.write('<script src="basic/js/jquery-1.9.min.js"><\/script>');
+</script>
+<script type="text/javascript" src="/basic/js/quick_links.js"></script>
+
+<div class="theme-popover-mask"></div>
+
+</body>
+
+</html>

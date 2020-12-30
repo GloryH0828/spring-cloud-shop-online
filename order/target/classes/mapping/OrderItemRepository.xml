@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gloryh.repository.OrderItemRepository">
+    <resultMap id="order_item" type="com.gloryh.entity.OrderItem">
+        <id property="id" column="id"></id>
+        <result property="buy_count" column="buy_count"></result>
+        <result property="buy_price" column="buy_price"></result>
+        <collection property="product" ofType="com.gloryh.entity.Product">
+            <id property="product_id" column="product_id"></id>
+            <result property="name" column="name"></result>
+            <result property="price" column="price"></result>
+            <result property="mark_price" column="mark_price"></result>
+            <result property="photo" column="photo"></result>
+        </collection>
+        <collection property="order" ofType="com.gloryh.entity.Order">
+            <id property="order_id" column="order_id"></id>
+        </collection>
+    </resultMap>
+   <select id="findByOrder" parameterType="string" resultMap="order_item">
+       SELECT * FROM order_item ,product
+       WHERE order_item.o_id = #{order_id}
+         AND order_item.p_id = product.product_id
+   </select>
+    <select id="findByOrderItemId" parameterType="long" resultMap="order_item">
+        SELECT * FROM order_item,product
+        WHERE order_item.o_id = #{order_id}
+          AND order_item.p_id = product.product_id
+    </select>
+    <insert id="save" parameterType="com.gloryh.entity.OrderItem">
+        INSERT INTO order_item (buy_count, buy_price, p_id, o_id)
+        VALUES (#{buy_count},#{buy_price},#{product.product_id},#{order.order_id})
+    </insert>
+    <delete id="deleteByOrderId" parameterType="string">
+        DELETE FROM order_item WHERE o_id =#{order_id}
+    </delete>
+    <delete id="deleteByOrderItemId" parameterType="long">
+        DELETE FROM order_item WHERE id=#{id}
+    </delete>
+</mapper>

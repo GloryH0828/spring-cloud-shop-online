@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gloryh.repository.AddressRepository">
+    <resultMap id="address" type="com.gloryh.entity.Address">
+        <id property="address_id" column="address_id"></id>
+        <result property="postcode" column="postcode"></result>
+        <result property="receiver" column="receiver"></result>
+        <result property="total_address" column="total_address"></result>
+        <result property="phone" column="phone"></result>
+        <collection property="vip" ofType="com.gloryh.entity.Vip">
+            <id property="vip_id" column="vip_id"></id>
+        </collection>
+        <collection property="province" ofType="com.gloryh.entity.Province">
+            <result property="province_id" column="province"></result>
+            <result property="province" column="province_name"></result>
+        </collection>
+        <collection property="city" ofType="com.gloryh.entity.City">
+            <result property="city_id" column="city"></result>
+            <result property="city" column="city_name"></result>
+        </collection>
+        <collection property="area" ofType="com.gloryh.entity.Area">
+            <result property="area_id" column="area"></result>
+            <result property="area" column="area_name"></result>
+        </collection>
+    </resultMap>
+    <select id="findAllByVip" parameterType="int" resultMap="address">
+        SELECT addr.*,
+               p.province_id,p.province AS province_name,
+               c.city_id,c.city AS city_name,
+               a.area_id,a.area AS area_name
+        FROM address AS addr ,provinces AS p,cities AS c,areas AS a
+        WHERE addr.v_id = #{vip_id}
+          AND addr.province = p.province_id
+          AND addr.city = c.city_id
+          AND addr.area = a.area_id
+    </select>
+    <select id="findById" resultMap="address">
+        SELECT addr.*,
+               p.province_id,p.province AS province_name,
+               c.city_id,c.city AS city_name,
+               a.area_id,a.area AS area_name
+        FROM address AS addr ,provinces AS p,cities AS c,areas AS a
+        WHERE addr.address_id =#{id}
+          AND addr.province = p.province_id
+          AND addr.city = c.city_id
+          AND addr.area = a.area_id
+    </select>
+    <insert id="save" parameterType="com.gloryh.entity.Address">
+        INSERT  INTO address( province, city, area, total_address, postcode, receiver, phone, v_id)
+        VALUES (#{province.province_id},#{city.city_id},#{area.area_id},#{total_address},#{postcode},#{receiver},#{phone},#{vip.vip_id})
+    </insert>
+    <update id="update" >
+        UPDATE address
+        SET province = #{province.province_id},
+            city = #{city.city_id},
+            area = #{area.area_id},
+            total_address = #{total_address},
+            postcode = #{postcode},
+            receiver = #{receiver},
+            phone =#{phone}
+        WHERE address_id = #{address_id}
+    </update>
+    <delete id="delete" parameterType="int">
+        DELETE FROM address WHERE address_id = #{id}
+    </delete>
+    <select id="getProvinces" resultType="com.gloryh.entity.Province">
+        SELECT * FROM provinces
+    </select>
+    <select id="getCitiesByProvinceId" parameterType="string" resultType="com.gloryh.entity.City">
+        SELECT  * FROM cities WHERE province_id = #{province_id}
+    </select>
+    <select id="getAreasByCityId" parameterType="string" resultType="com.gloryh.entity.Area">
+        SELECT * FROM areas WHERE city_id = #{city_id}
+    </select>
+</mapper>

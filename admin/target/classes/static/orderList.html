@@ -1,0 +1,209 @@
+<!DOCTYPE html >
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta CHARSET="UTF-8">
+    <title>订单列表</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/select.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script language="JavaScript" src="/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="/js/select-ui.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".click").click(function () {
+                $(".tip").fadeIn(200);
+            });
+
+            $(".tiptop a").click(function () {
+                $(".tip").fadeOut(200);
+            });
+
+            $(".sure").click(function () {
+                $(".tip").fadeOut(100);
+            });
+
+            $(".cancel").click(function () {
+                $(".tip").fadeOut(100);
+            });
+
+        });
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function (e) {
+            $(".select1").uedSelect({
+                width: 280
+            });
+            $(".select2").uedSelect({
+                width: 167
+            });
+            $(".select3").uedSelect({
+                width: 100
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a></li>
+        <li><a href="#">订单列表</a></li>
+    </ul>
+</div>
+
+<div class="formbody">
+
+    <div class="tools">
+        <ul class="toolbar">
+            <li><span><input name="" type="checkbox" value=""
+                             checked="checked"/>&nbsp;</span>全选
+            </li>
+            <li class="click"><span><img src="/images/t03.png"/> </span>删除</li>
+        </ul>
+
+        <form action="#" method="post">
+            <ul class="seachform">
+                <li><label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    按关键字&nbsp;&nbsp;</label><input name="" type="text" class="scinput"/></li>
+                <li><label>查询&nbsp;&nbsp;按</label>
+                    <div class="vocation">
+                        <select class="select3">
+                            <option>分类</option>
+                            <option>id</option>
+                            <option>名称</option>
+                        </select>
+                    </div>
+                </li>
+                <li><label>&nbsp;</label><input name="" type="button"
+                                                class="scbtn" value="查询"/></li>
+            </ul>
+        </form>
+
+    </div>
+
+
+    <div class="toolsli" th:each="order:${page.list}">
+        <table class="imgtable">
+            <thead>
+            <tr>
+                <th style="width: 80px;"><input th:name="${order.order_id}" type="checkbox" th:value="${order.order_id}" />
+                </th>
+                <th style="text-align: center;" colspan="3" th:if="${order.status == 0}" th:text="'订单编号：'+${order.order_id}+'&nbsp;&nbsp;合计￥'+${order.total_price}+'&nbsp;&nbsp;买家未付款'">
+                </th>
+                <th style="text-align: center;" colspan="3" th:if="${order.status == 1}" th:text="'订单编号：'+${order.order_id}+'&nbsp;&nbsp;合计￥'+${order.total_price}+'&nbsp;&nbsp;等待发货'">
+                </th>
+                <th style="text-align: center;" colspan="3" th:if="${order.status == 2}" th:text="'订单编号：'+${order.order_id}+'&nbsp;&nbsp;合计￥'+${order.total_price}+'&nbsp;&nbsp;买家待收货'">
+                </th>
+                <th style="text-align: center;" colspan="3" th:if="${order.status == 3}" th:text="'订单编号：'+${order.order_id}+'&nbsp;&nbsp;合计￥'+${order.total_price}+'&nbsp;&nbsp;买家已收货'">
+                </th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="item:${order.orderItems}">
+                <td class="imgtd" style="width: 80px;">
+                    <img th:src="'/product/'+${item.product.product_id}+'.jpg'" style="height: 80px;width: 80px;"/>
+                </td>
+                <td><a th:href="'/product/findToDes/'+${item.product.product_id}" th:text="${item.product.name}"></a></td>
+                <td th:text="'￥'+${item.product.price}"></td>
+                <td th:text="${item.buy_count}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="pagin">
+        <div class="message">
+            共<i class="blue" th:text="${page.totalSize}"></i>条记录，当前显示第&nbsp;<i class="blue"
+                                                                                   th:text="${page.currentPage}">&nbsp;</i>&nbsp;页
+        </div>
+        <ul class="paginList" th:if="${page.totalPage - page.currentPage ge 5}">
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.currentPage -1}"><span
+                    class="pagepre"></span>
+            </a>
+            </li>
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.currentPage }"
+                                     th:text="${page.currentPage }"></a>
+            </li>
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.currentPage +1}"
+                                     th:text="${page.currentPage +1}"></a>
+            </li>
+            <li class="paginItem more"><a href="javascript:;">...</a>
+            </li>
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.totalPage -1}"
+                                     th:text="${page.totalPage -1}"></a>
+            </li>
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.totalPage}"
+                                     th:text="${page.totalPage}"></a>
+            </li>
+
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.currentPage +1}"><span
+                    class="pagenxt"></span>
+            </a>
+            </li>
+        </ul>
+        <ul class="paginList" th:if="${page.totalPage le 5} ">
+            <li class="paginItem" th:if="${page.totalPage - 1 ge 0}"><a href="/order/findAll/1" th:text="1">
+            </a>
+            <li class="paginItem" th:if="${page.totalPage - 2 ge 0}"><a href="/order/findAll/2" th:text="2">
+            </a>
+            <li class="paginItem" th:if="${page.totalPage - 3 ge 0}"><a href="/order/findAll/3" th:text="3">
+            </a>
+            <li class="paginItem" th:if="${page.totalPage - 4 ge 0}"><a href="/order/findAll/4" th:text="4">
+            </a>
+            <li class="paginItem" th:if="${page.totalPage - 5 ge 0}"><a href="/order/findAll/5" th:text="5">
+            </a>
+            </li>
+
+        </ul>
+        <ul class="paginList" th:if="${page.totalPage - page.currentPage lt 5 && page.totalPage gt 5}">
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.currentPage -1}"><span
+                    class="pagepre"></span>
+            </a>
+            </li>
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.totalPage -4}"
+                                     th:text="${page.totalPage -4}">
+            </a>
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.totalPage -3}"
+                                     th:text="${page.totalPage -3}">
+            </a>
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.totalPage -2}"
+                                     th:text="${page.totalPage -2}">
+            </a>
+            <li class="paginItem"><a th:href="'/order/findAll/'+${page.totalPage -1}"
+                                     th:text="${page.totalPage -1}">
+            </a>
+            <li class="paginItem"><a th:href="'/order0./findAll/'+${page.totalPage}"
+                                     th:text="${page.totalPage}">
+            </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="tip">
+        <div class="tiptop">
+            <span>提示信息</span><a></a>
+        </div>
+
+        <div class="tipinfo">
+            <span><img src="/images/ticon.png"/> </span>
+            <div class="tipright">
+                <p>是否确认对信息的修改 ？</p>
+                <cite>如果是请点击确定按钮 ，否则请点取消。</cite>
+            </div>
+        </div>
+
+        <div class="tipbtn">
+            <input name="" type="button" class="sure" value="确定"/>&nbsp; <input
+                name="" type="button" class="cancel" value="取消"/>
+        </div>
+    </div>
+</body>
+</html>

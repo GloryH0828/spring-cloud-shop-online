@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>验证结果</title>
+    <script src="/basic/js/jquery-1.7.min.js"></script>
+
+</head>
+<body>
+<input id="code" type="hidden" th:value="${result.code}"/>
+</body>
+<script th:inline="javascript">
+    var result = [(${result.status})];
+    var code = document.getElementById("code").value;
+    if (result == 1){
+        alert("激活成功，跳转至登录页");
+        window.location.href="/login.html";
+    }else if (result == 2){
+        alert("验证码已过期，请使用新的激活码进行激活");
+        $.ajax({
+            url: "/account/updateActivation/"+code,
+            type: "post",
+            data: "",
+            dataType:"json",
+            contentType:"application/json",
+            processData: false,
+            success: function (data) {
+                window.opener = null;
+                window.open('', '_self');
+                window.close();
+            },
+            error: function (data) {
+                alert("新的激活码发送失败，请稍后重试！");
+            }
+        });
+    }else if (result == 3){
+        alert("该账户已激活，请勿重复操作");
+        window.opener = null;
+        window.open('', '_self');
+        window.close();
+    }else {
+        alert("访问错误，未查询到对应信息");
+        window.opener = null;
+        window.open('', '_self');
+        window.close();
+    }
+</script>
+</html>

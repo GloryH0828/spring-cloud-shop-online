@@ -1,0 +1,113 @@
+<!DOCTYPE >
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>updateCategory</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/select.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script language="JavaScript" src="/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="/js/select-ui.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function (e) {
+
+            $(".select1").uedSelect({
+                width: 280
+            });
+            $(".select2").uedSelect({
+                width: 167
+            });
+            $(".select3").uedSelect({
+                width: 100
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a>
+        </li>
+        <li><a href="#">修改分类</a>
+        </li>
+    </ul>
+</div>
+
+<form id="form1">
+    <div class="formbody">
+
+        <div class="formtitle">
+            <span>修改分类</span>
+        </div>
+
+        <ul class="forminfo">
+            <li><label>分类名称<b>*</b>
+            </label>
+                <input type="hidden" name="category_id" th:value="${category.category_id}"/>
+                <input name="type_name" th:value="${category.type_name}" type="text" class="dfinput"
+                           style="width:278px;"/>
+            </li>
+            <li><label>商品分类排序<b>*</b>
+            </label>
+                <div class="vocation">
+                    <select class="select1" name="sort">
+                        <option value="">请选择分类排序</option>
+                        <option th:value="1" th:selected="${category.sort == 1}">1</option>
+                        <option th:value="2" th:selected="${category.sort == 2}">2</option>
+                        <option th:value="3" th:selected="${category.sort == 3}">3</option>
+                        <option th:value="4" th:selected="${category.sort == 4}">4</option>
+                        <option th:value="5" th:selected="${category.sort == 5}">5</option>
+                    </select>
+                </div>
+            </li>
+            <li><label>&nbsp;</label><input onclick="javascript:updateCategory()" type="button"
+                                            class="btn" value="修改"/>
+            </li>
+        </ul>
+
+    </div>
+</form>
+<script type="text/javascript">
+    function updateCategory() {
+        var params = $("#form1").serializeArray();
+        var list = {};
+
+        for (var item in params) {
+            list[params[item].name] = params[item].value;
+        }
+        if (list["type_name"].length == 0) {
+            alert("商品分类名不得为空");
+            return;
+        }
+        $.ajax({
+            url: '/category/update',
+            data: JSON.stringify(list),
+            type: 'PUT',
+            dataType: 'json',
+            /*
+           声明参数位json类型，便于后台接收时可以识别
+            */
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            processData: false,
+            cache: false
+        }).done(function (data) {
+            var status = data.status;
+            if (status == 0) {
+                alert("修改成功！");
+                window.location.href = "/category/findAll/1";
+            } else {
+                alert("修改失败！");
+            }
+        });
+    }
+</script>
+</body>
+</html>

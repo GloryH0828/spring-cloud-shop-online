@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gloryh.repository.VipRepository">
+    <resultMap id="activate" type="com.gloryh.entity.Activate">
+        <id property="activate_id" column="activate_id"></id>
+        <result property="code" column="code"></result>
+        <result property="expire_date" column="expire_date"></result>
+        <collection property="vip" ofType="com.gloryh.entity.Vip">
+            <id property="vip_id" column="vip_id"></id>
+            <result property="email" column="email"></result>
+        </collection>
+    </resultMap>
+    <select id="findVipById" resultType="com.gloryh.entity.Vip">
+        SELECT * FROM vip WHERE vip_id = #{vip_id}
+    </select>
+    <select id="login" resultType="com.gloryh.entity.Vip">
+        SELECT * FROM vip WHERE username = #{param1} AND password = #{param2}
+    </select>
+    <insert id="register" parameterType="com.gloryh.entity.Vip" useGeneratedKeys="true" keyProperty="vip_id">
+        INSERT INTO vip(username, password, name, sex, email, photo, score, question, answer, phone)
+        VALUES (#{username}, #{password}, #{name}, #{sex}, #{email}, #{photo}, 1, #{question}, #{answer}, #{phone})
+    </insert>
+    <update id="updateLoginTime" >
+        UPDATE vip set last_login_time =#{date} WHERE username = #{username}
+    </update>
+    <select id="findByUsername" resultType="com.gloryh.entity.Vip" parameterType="string">
+        SELECT * FROM vip WHERE username = #{username}
+    </select>
+    <update id="updateStatusByVipId">
+        UPDATE vip
+        SET status = 1
+        WHERE vip_id = #{vip_id}
+    </update>
+    <insert id="addActivation" parameterType="com.gloryh.entity.Activate">
+        INSERT INTO activate( v_id, code, expire_date)
+        VALUES (#{vip.vip_id}, #{code}, #{expire_date})
+    </insert>
+    <select id="findActivateByCode" parameterType="string" resultMap="activate">
+        SELECT * FROM activate,vip
+        WHERE code =#{code}
+        AND activate.v_id = vip.vip_id
+    </select>
+    <update id="updateActivation">
+        UPDATE activate
+        SET code = #{code},expire_date = #{expire_date}
+        WHERE activate_id = #{activate_id}
+    </update>
+
+</mapper>

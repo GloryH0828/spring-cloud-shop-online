@@ -1,0 +1,10 @@
+server:
+  port: 8011
+spring:
+  thymeleaf:
+    prefix: classpath:/static/
+    suffix: .html
+mvc:
+  view:
+    prefix: classpath:/static/
+    suffix: .html

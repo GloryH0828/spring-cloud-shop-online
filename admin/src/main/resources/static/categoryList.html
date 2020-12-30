@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>right</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css"/>
+    <script language="JavaScript" src="/js/jquery.js"></script>
+    <script language="JavaScript" src="/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#all").click(function () {
+                if (this.checked) {
+                    $(":checkbox").attr("checked", true);
+                } else {
+                    $(":checkbox").attr("checked", false);
+                }
+            });
+        });
+        $(document).ready(function () {
+            $(".click").click(function () {
+                $(".tip").fadeIn(200);
+            });
+
+            $(".tiptop a").click(function () {
+                $(".tip").fadeOut(200);
+            });
+
+            $(".sure").click(function () {
+                $(".tip").fadeOut(100);
+            });
+
+            $(".cancel").click(function () {
+                $(".tip").fadeOut(100);
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a>
+        </li>
+        <li><a href="#">分类列表</a>
+        </li>
+    </ul>
+</div>
+
+<div class="rightinfo">
+
+    <div class="tools">
+        <ul class="toolbar">
+            <li><a href="/account/redirect/addCategory"><span><img
+                    src="/images/t01.png"/>
+					</span>添加</a>
+            </li>
+            <li class="click"><span><img src="/images/t03.png"/>
+				</span>删除
+            </li>
+        </ul>
+    </div>
+
+    <table class="tablelist">
+        <thead>
+        <tr>
+            <th><input id="all" type="checkbox"/>
+            </th>
+            <th>编号<i class="sort"><img src="/images/px.gif"/>
+            </i>
+            </th>
+            <th>分类名称</th>
+            <th>分类排序</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+
+        <form id="form1">
+            <tbody>
+            <tr th:each="list:${category.list}">
+                <td><input th:name="category_id" type="checkbox" th:value="${list.category_id}"/>
+                </td>
+                <td th:text="${list.category_id}"></td>
+                <td th:text="${list.type_name}"></td>
+                <td th:text="${list.sort}"></td>
+                <td><a th:href="'/category/findById/'+${list.category_id}" class="tablelink"
+                       target="rightFrame">修改</a> <a th:href="'/category/delete/'+${list.category_id}" class="click">
+                    删除</a>
+                </td>
+            </tr>
+            </tbody>
+        </form>
+    </table>
+
+
+    <div class="pagin">
+        <div class="message">
+            共<i class="blue" th:text="${category.totalSize}"></i>条记录，当前显示第&nbsp;<i class="blue"
+                                                                                   th:text="${category.currentPage}">&nbsp;</i>&nbsp;页
+        </div>
+        <ul class="paginList" th:if="${category.totalPage - category.currentPage ge 5}">
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.currentPage -1}"><span
+                    class="pagepre"></span>
+            </a>
+            </li>
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.currentPage }"
+                                     th:text="${category.currentPage }"></a>
+            </li>
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.currentPage +1}"
+                                     th:text="${category.currentPage +1}"></a>
+            </li>
+            <li class="paginItem more"><a href="javascript:;">...</a>
+            </li>
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.totalPage -1}"
+                                     th:text="${category.totalPage -1}"></a>
+            </li>
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.totalPage}"
+                                     th:text="${category.totalPage}"></a>
+            </li>
+
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.currentPage +1}"><span
+                    class="pagenxt"></span>
+            </a>
+            </li>
+        </ul>
+        <ul class="paginList" th:if="${category.totalPage le 5} ">
+            <li class="paginItem" th:if="${category.totalPage - 1 ge 0}"><a href="/category/findAll/1" th:text="1">
+            </a>
+            <li class="paginItem" th:if="${category.totalPage - 2 ge 0}"><a href="/category/findAll/2" th:text="2">
+            </a>
+            <li class="paginItem" th:if="${category.totalPage - 3 ge 0}"><a href="/category/findAll/3" th:text="3">
+            </a>
+            <li class="paginItem" th:if="${category.totalPage - 4 ge 0}"><a href="/category/findAll/4" th:text="4">
+            </a>
+            <li class="paginItem" th:if="${category.totalPage - 5 ge 0}"><a href="/category/findAll/5" th:text="5">
+            </a>
+            </li>
+
+        </ul>
+        <ul class="paginList" th:if="${category.totalPage - category.currentPage lt 5 && category.totalPage gt 5}">
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.currentPage -1}"><span
+                    class="pagepre"></span>
+            </a>
+            </li>
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.totalPage -4}"
+                                     th:text="${category.totalPage -4}">
+            </a>
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.totalPage -3}"
+                                     th:text="${category.totalPage -3}">
+            </a>
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.totalPage -2}"
+                                     th:text="${category.totalPage -2}">
+            </a>
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.totalPage -1}"
+                                     th:text="${category.totalPage -1}">
+            </a>
+            <li class="paginItem"><a th:href="'/category/findAll/'+${category.totalPage}"
+                                     th:text="${category.totalPage}">
+            </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="tip">
+        <div class="tiptop">
+            <span>提示信息</span><a></a>
+        </div>
+
+        <div class="tipinfo">
+				<span><img src="/images/ticon.png"/>
+				</span>
+            <div class="tipright">
+                <p>是否确认对信息的删除 ？</p>
+                <cite>如果是请点击确定按钮 ，否则请点取消。</cite>
+            </div>
+        </div>
+        <div class="tipbtn">
+            <input type="button" onclick="deleteMore()" class="sure" value="确定"/>&nbsp;
+            <input type="button" class="cancel" value="取消"/>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('.tablelist tbody tr:odd').addClass('odd');
+
+    function deleteMore() {
+        var params = $("#form1").serializeArray();
+        var list = {};
+        var ids = [];
+        for (var item in params) {
+            list[params[item].name] = params[item].value;
+            if (params[item].name == "category_id") {
+                ids.push(params[item].value);
+            }
+        }
+        if (ids.length == 0) {
+            alert("您选中的待删除的分类信息为空");
+            return;
+        }
+        $.ajax({
+            url: '/category/deleteMore',
+            data: JSON.stringify(ids),
+            type: 'DELETE',
+            dataType: 'json',
+            /*
+           声明参数位json类型，便于后台接收时可以识别
+            */
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            processData: false,
+            cache: false
+        }).done(function (data) {
+            var status = data.status;
+            if (status == 0) {
+                alert("批量删除成功！");
+                window.location.href = "/category/findAll/1";
+            } else {
+                alert("删除失败！");
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>productList</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/select.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script language="JavaScript" src="/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="/js/select-ui.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".click").click(function () {
+                $(".tip").fadeIn(200);
+            });
+
+            $(".tiptop a").click(function () {
+                $(".tip").fadeOut(200);
+            });
+
+            $(".sure").click(function () {
+                $(".tip").fadeOut(100);
+            });
+
+            $(".cancel").click(function () {
+                $(".tip").fadeOut(100);
+            });
+
+        });
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function (e) {
+            $(".select1").uedSelect({
+                width: 280
+            });
+            $(".select2").uedSelect({
+                width: 167
+            });
+            $(".select3").uedSelect({
+                width: 100
+            });
+        });
+    </script>
+
+</head>
+
+
+<body>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a>
+        </li>
+        <li><a href="#">商品列表</a>
+        </li>
+    </ul>
+</div>
+
+<div class="rightinfo">
+
+    <div class="tools">
+        <ul class="toolbar">
+            <li><a href="/category/addProduct"><span><img
+                    src="/images/t01.png"/>
+					</span>添加</a>
+            </li>
+            <li class="click" ><span><img src="/images/t03.png"/>
+				</span>删除
+            </li>
+        </ul>
+
+        <form id="searchForm">
+            <ul class="seachform">
+                <li><label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    按关键字&nbsp;&nbsp;</label><input name="condition" type="text" class="scinput"/>
+                </li>
+                <li><label>查询&nbsp;&nbsp;按</label>
+                    <div class="vocation">
+                        <select class="select3" name="type">
+                            <option value="findByCategory">分类</option>
+                            <option value="findById">id</option>
+                            <option value="findByName">名称</option>
+                        </select>
+                    </div>
+                </li>
+                <li><label>&nbsp;</label><input type="button"
+                                                class="scbtn" value="查询" onclick="search()"/>
+                </li>
+            </ul>
+        </form>
+
+    </div>
+
+    <form id="formList">
+        <table class="tablelist">
+            <thead>
+            <tr>
+                <th><input id="all" type="checkbox" value="" />
+                </th>
+                <th>编号<i class="sort"><img src="/images/px.gif"/>
+                </i>
+                </th>
+                <th>商品名称</th>
+                <th>价格</th>
+                <th>市场价格</th>
+                <th>库存量</th>
+                <th>商品种类</th>
+                <th>发布时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="list:${product.list}">
+                <td><input name="product_id" type="checkbox" th:value="${list.product_id}"/>
+                </td>
+                <td th:text="${list.product_id}"></td>
+                <td th:text="${list.name}"></td>
+                <td th:text="${list.price}"></td>
+                <td th:text="${list.mark_price}"></td>
+                <td th:text="${list.quantity}">30</td>
+                <td th:text="${list.category.type_name}"></td>
+                <td th:text="${#dates.format(list.time,'yyyy-MM-dd')}"></td>
+                <td><a th:href="'/product/findToDes/'+${list.product_id}" class="tablelink">查看</a>
+                    <a th:href="'/product/findToUpdate/'+${list.product_id}" class="tablelink"> 修改</a>
+                    <a th:href="'/product/delete/'+${list.product_id}" class="click"> 删除</a>
+                </td>
+            </tr>
+            </tbody>
+    </form>
+    </table>
+
+
+    <div class="pagin" th:if="${findType == 1}">
+        <div class="message">
+            共<i class="blue" th:text="${product.totalSize}"></i>条记录，当前显示第&nbsp;<i class="blue"
+                                                                                  th:text="${product.currentPage}">&nbsp;</i>&nbsp;页
+        </div>
+        <ul class="paginList" th:if="${product.totalPage - product.currentPage ge 5}">
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.currentPage -1}"><span
+                    class="pagepre"></span>
+            </a>
+            </li>
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.currentPage }"
+                                     th:text="${product.currentPage }"></a>
+            </li>
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.currentPage +1}"
+                                     th:text="${product.currentPage +1}"></a>
+            </li>
+            <li class="paginItem more"><a href="javascript:;">...</a>
+            </li>
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.totalPage -1}"
+                                     th:text="${product.totalPage -1}"></a>
+            </li>
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.totalPage}"
+                                     th:text="${product.totalPage}"></a>
+            </li>
+
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.currentPage +1}"><span
+                    class="pagenxt"></span>
+            </a>
+            </li>
+        </ul>
+        <ul class="paginList" th:if="${product.totalPage le 5} ">
+            <li class="paginItem" th:if="${product.totalPage - 1 ge 0}"><a href="/product/findAll/1" th:text="1">
+            </a>
+            <li class="paginItem" th:if="${product.totalPage - 2 ge 0}"><a href="/product/findAll/2" th:text="2">
+            </a>
+            <li class="paginItem" th:if="${product.totalPage - 3 ge 0}"><a href="/product/findAll/3" th:text="3">
+            </a>
+            <li class="paginItem" th:if="${product.totalPage - 4 ge 0}"><a href="/product/findAll/4" th:text="4">
+            </a>
+            <li class="paginItem" th:if="${product.totalPage - 5 ge 0}"><a href="/product/findAll/5" th:text="5">
+            </a>
+            </li>
+
+        </ul>
+        <ul class="paginList" th:if="${product.totalPage - product.currentPage lt 5 && product.totalPage gt 5}">
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.currentPage -1}"><span
+                    class="pagepre"></span>
+            </a>
+            </li>
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.totalPage -4}"
+                                     th:text="${product.totalPage -4}">
+            </a>
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.totalPage -3}"
+                                     th:text="${product.totalPage -3}">
+            </a>
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.totalPage -2}"
+                                     th:text="${category.totalPage -2}">
+            </a>
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.totalPage -1}"
+                                     th:text="${product.totalPage -1}">
+            </a>
+            <li class="paginItem"><a th:href="'/product/findAll/'+${product.totalPage}"
+                                     th:text="${product.totalPage}">
+            </a>
+            </li>
+        </ul>
+    </div>
+
+
+    <div class="tip">
+        <div class="tiptop">
+            <span>提示信息</span><a></a>
+        </div>
+        <div class="tipinfo">
+				<span><img src="/images/ticon.png"/>
+				</span>
+            <div class="tipright">
+                <p>是否确认对信息的修改 ？</p>
+                <cite>如果是请点击确定按钮 ，否则请点取消。</cite>
+            </div>
+        </div>
+        <div class="tipbtn">
+            <input onclick="deleteMore()" type="button" class="sure" value="确定"/>&nbsp;
+            <input type="button" class="cancel" value="取消"/>
+        </div>
+    </div>
+
+</div>
+
+<script language="JavaScript">
+    $('.tablelist tbody tr:odd').addClass('odd');
+    $(function () {
+        $("#all").click(function () {
+            if (this.checked) {
+                $(":checkbox").attr("checked", true);
+            } else {
+                $(":checkbox").attr("checked", false);
+            }
+        });
+    });
+
+    function deleteMore() {
+        var params = $("#formList").serializeArray();
+        var list = {};
+        var ids = [];
+        for (var item in params) {
+            list[params[item].name] = params[item].value;
+            if (params[item].name == "product_id") {
+                ids.push(params[item].value);
+            }
+        }
+        if (ids.length == 0) {
+            alert("您选中的待删除的分类信息为空");
+            return;
+        }
+        $.ajax({
+            url: '/product/deleteMore',
+            data: JSON.stringify(ids),
+            type: 'DELETE',
+            dataType: 'json',
+            /*
+           声明参数位json类型，便于后台接收时可以识别
+            */
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            processData: false,
+            cache: false
+        }).done(function (data) {
+            var status = data.status;
+            if (status == 0) {
+                alert("批量删除成功！");
+                window.location.href = "/product/findAll/1";
+            } else {
+                alert("删除失败！");
+            }
+        });
+    }
+    function search() {
+        var params = $("#searchForm").serializeArray();
+        var array = {};
+        var regNum = /^[0-9]*$/;
+        for (var item in params) {
+            array[params[item].name] = params[item].value;
+        }
+        if (array["condition"].length == 0){
+            alert("查询不得为空！");
+            return;
+        }else {
+           var condition=array["condition"];
+        }
+        if (array["type"]=="findById" && !regNum.test(array["condition"])){
+            alert("按id查询需要输入正确的id");
+            return;
+        }else {
+            var type=array["type"];
+        }
+        window.location.href="/product/"+type+"/"+encodeURI(condition);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gloryh.repository.ProvinceCityAreaRepository">
+    <select id="findAllProvince" resultType="com.gloryh.entity.Province">
+        SELECT * FROM provinces;
+    </select>
+    <select id="findCityByProvince" resultType="com.gloryh.entity.City">
+        SELECT * FROM cities WHERE province_id = #{province_id}
+    </select>
+    <select id="findAreaByCity" resultType="com.gloryh.entity.Area">
+        SELECT * FROM areas WHERE city_id= #{city_id}
+    </select>
+</mapper>

@@ -1,0 +1,14 @@
+spring:
+  resources:
+    static-locations: classpath:/static,file:C:/Users/admin/Desktop/pictures
+  application:
+    name: admin
+  profiles:
+    active: dev
+  cloud:
+    config:
+      uri: http://localhost:8762
+      fail-fast: true
+ribbon:
+  ReadTimeout: 61000
+  ConnectTimeout: 61000

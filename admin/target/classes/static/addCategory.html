@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>无标题文档</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/select.css" rel="stylesheet" type="text/css"/>
+    <script language="JavaScript" src="/js/jquery.js"></script>
+    <script language="JavaScript" src="/js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="/js/select-ui.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function (e) {
+
+            $(".select1").uedSelect({
+                width: 280
+            });
+            $(".select2").uedSelect({
+                width: 167
+            });
+            $(".select3").uedSelect({
+                width: 100
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+        <li><a href="#">首页</a>
+        </li>
+        <li><a href="#">添加分类</a>
+        </li>
+    </ul>
+</div>
+<form id="category">
+    <div class="formbody">
+        <div class="formtitle">
+            <span>添加分类</span>
+        </div>
+
+        <ul class="forminfo">
+            <li><label>分类名称<b>*</b>
+            </label><input name="type_name" type="text" class="dfinput" style="width:278px;"/>
+            </li>
+            <li><label>商品分类排序<b>*</b>
+            </label>
+                <div class="vocation">
+                    <input name="sort" type="number" class="dfinput" min="1" max="100" style="width:278px;"/>
+                </div>
+            </li>
+            <li><label>&nbsp;</label><input onclick="javascript:addCategory()" type="button"
+                                            class="btn" value="添加"/>
+            </li>
+        </ul>
+
+    </div>
+</form>
+<script language="JavaScript">
+    function addCategory() {
+        var params = $("#category").serializeArray();
+        var category = {};
+        for (var item in params) {
+            category[params[item].name] = params[item].value;
+        }
+        if (category["type_name"].length == 0) {
+            alert("请输入分类名");
+            return;
+        }
+        $.ajax({
+            url: '/category/save',
+            data: JSON.stringify(category),
+            type: 'POST',
+            dataType: 'json',
+            /*
+           声明参数位json类型，便于后台接收时可以识别
+            */
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            processData: false,
+            cache: false
+        }).done(function (data) {
+            var status = data.status;
+            //alert(status);
+            if (status == 0) {
+                alert("您好，新的商品分类添加成功");
+                window.location.href = "/category/findAll/1";
+            } else if (status == 1){
+                alert("该桑品分类已存在！");
+            }else {
+                alert("信息输入有误，请重新输入！");
+            }
+        });
+    }
+</script>
+</body>
+</html>
